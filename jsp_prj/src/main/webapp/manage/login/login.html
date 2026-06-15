@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Admin Login</title>
+  <link rel="stylesheet" href="../css/login.css" />
+</head>
+
+<body>
+  <div class="wrapper">
+    <div class="login-container">
+
+      <div class="logo">
+        <span class="kurly">프레시 마켓</span>
+        <span class="management">management</span>
+      </div>
+
+      <div class="divider"></div>
+
+      <h2>로그인</h2>
+
+      <form id="loginForm">
+
+        <input
+          type="text"
+          id="id"
+          placeholder="아이디를 입력해주세요"
+        />
+
+        <input
+          type="password"
+          id="pw"
+          placeholder="비밀번호를 입력해주세요"
+        />
+
+        <button type="submit">로그인</button>
+
+      </form>
+
+      <p id="errorMsg"></p>
+
+    </div>
+  </div>
+
+  <script src="../js/login.js"></script>
+</body>
+</html>
