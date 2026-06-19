@@ -10,7 +10,7 @@
 
 <meta charset="UTF-8">
 
-<title>관리자 대시보드</title>
+<title>Dashboard</title>
 
 <link href="http://localhost/jsp_prj/manage/css/bootstrap.min.css"
 	rel="stylesheet">
@@ -40,7 +40,7 @@
 
 				<li class="active"><a href="dashboard.jsp"> Dashboard </a></li>
 
-				<li><a href="../Products/adminProducts.jsp"> Products </a></li>
+				<li><a href="../Products/vieweditProducts.jsp"> Products </a></li>
 
 				<li><a href="adminCategories.jsp"> Categories </a></li>
 
@@ -58,7 +58,7 @@
 					<li><a href="settings.jsp"> Settings </a></li>
 
 					<li>
-						<div class="logout">Logout</div>
+						<a href="../login/login.jsp" class="logout">Logout</a>
 					</li>
 				</ul>
 			</div>
