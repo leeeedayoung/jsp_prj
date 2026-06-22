@@ -32,16 +32,16 @@
 
 			<ul>
 				<li><a href="../dashboard/dashboard.jsp"> Dashboard </a></li>
-				<li><a href="vieweditProducts.jsp"> Products </a>
+				<li><a href="../Products/vieweditProducts.jsp"> Products </a>
 					<ul class="sub-menu">
-						<li class="active"><a href="vieweditProducts.jsp"> View/Edit Products </a></li>
-						<li><a href="addProduct.jsp"> Add Product </a></li>
-					</ul>
-				</li>
-				<li><a href="adminCategories.jsp"> Categories </a></li>
-				<li><a href="adminOrder.jsp"> Order </a></li>
-				<li><a href="adminUsers.jsp"> Users </a></li>
-				<li><a href="adminInquiries.jsp"> Inquiries </a></li>
+						<li class="active"><a href="../Products/vieweditProducts.jsp">
+								View/Edit Products </a></li>
+						<li><a href="../Products/addProduct.jsp"> Add Product </a></li>
+					</ul></li>
+				<li><a href="../Categories/adminCategories.jsp"> Categories </a></li>
+				<li><a href="../order/adminOrder.jsp"> Order </a></li>
+				<li><a href="../user/adminUsers.jsp"> Users </a></li>
+				<li><a href="../inquiries/adminInquiries.jsp"> Inquiries </a></li>
 			</ul>
 
 			<div class="bottom-menu">
@@ -100,7 +100,8 @@
 						<div class="search-title">검색어</div>
 
 						<div class="search-content">
-							<input type="text" id="keyword" class="form-control" placeholder="상품명을 입력하세요">
+							<input type="text" id="keyword" class="form-control"
+								placeholder="상품명을 입력하세요">
 						</div>
 					</div>
 
@@ -108,10 +109,12 @@
 						<div class="search-title">판매상태</div>
 
 						<div class="search-content">
-							<label> <input type="radio" name="status" value="all" checked>
-								전체
-							</label> <label> <input type="radio" name="status" value="sale"> 판매중
-							</label> <label> <input type="radio" name="status" value="soldout"> 품절
+							<label> <input type="radio" name="status" value="all"
+								checked> 전체
+							</label> <label> <input type="radio" name="status" value="sale">
+								판매중
+							</label> <label> <input type="radio" name="status"
+								value="soldout"> 품절
 							</label>
 						</div>
 					</div>
@@ -146,7 +149,8 @@
 							</div>
 
 							<div class="date-input">
-								<input type="date" id="startDate"> ~ <input type="date" id="endDate">
+								<input type="date" id="startDate"> ~ <input type="date"
+									id="endDate">
 							</div>
 
 						</div>
@@ -187,12 +191,18 @@
 					<tbody>
 						<c:forEach var="product" items="${productList}">
 							<tr>
-								<td><input type="checkbox" class="productCheck" value="${product.productNo}"></td>
+								<td><input type="checkbox" class="productCheck"
+									value="${product.productNo}"></td>
 								<td>
-									<button class="btn btn-sm btn-outline-secondary">수정</button>
+									<button class="btn btn-sm btn-outline-secondary edit-btn"
+										data-product-no="${product.productNo}"
+										data-name="${product.productName}"
+										data-status="${product.status}" data-stock="${product.stock}">
+										수정</button>
 								</td>
 								<td>
-									<button class="btn btn-sm btn-warning copy-btn" data-product-no="${product.productNo}">복사</button>
+									<button class="btn btn-sm btn-warning copy-btn"
+										data-product-no="${product.productNo}">복사</button>
 								</td>
 
 								<td>${product.productNo}</td>
@@ -223,8 +233,71 @@
 
 		</div>
 	</div>
-	
+
 	<script src="http://localhost/jsp_prj/manage/js/vieweditProducts.js"></script>
+
+	<!-- 상품 수정 모달 -->
+	<div id="editModal" class="modal-overlay">
+
+		<div class="modal-box">
+
+			<div class="modal-header">
+				<span>상품 정보</span>
+				<button id="closeModal">&times;</button>
+			</div>
+
+			<div class="modal-body">
+
+				<input type="hidden" id="editProductNo">
+
+				<div class="form-group">
+					<label>카테고리 <span class="required">*</span></label> <select
+						id="editCategory">
+						<option>채소</option>
+						<option>과일</option>
+					</select>
+				</div>
+
+				<div class="form-group">
+					<label>상품명 <span class="required">*</span></label> <input
+						type="text" id="editName">
+				</div>
+
+				<div class="form-group">
+					<label>판매상태</label> <select id="editStatus">
+						<option selected="selected">판매중</option>
+						<option>품절</option>
+					</select>
+				</div>
+
+				<div class="form-group">
+					<label>가격</label>
+
+					<div class="price-box">
+						<span>₩</span> <input type="text" id="editPrice">
+					</div>
+				</div>
+
+				<div class="form-group">
+					<label>재고수량</label>
+
+					<div class="stock-box">
+						<button type="button" id="minusBtn">-</button>
+						<input type="text" id="editStock" value="5">
+						<button type="button" id="plusBtn">+</button>
+					</div>
+				</div>
+
+			</div>
+
+			<div class="modal-footer">
+				<button id="cancelBtn">취소</button>
+				<button id="saveBtn">저장하기</button>
+			</div>
+
+		</div>
+
+	</div>
 
 </body>
 

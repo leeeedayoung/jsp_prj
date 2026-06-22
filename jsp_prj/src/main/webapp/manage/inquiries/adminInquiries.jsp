@@ -1,0 +1,165 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+	pageEncoding="UTF-8"%>
+
+<%@ page import="java.util.*"%>
+
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Inquiries</title>
+<link href="http://localhost/jsp_prj/manage/css/bootstrap.min.css"
+	rel="stylesheet">
+
+<link href="http://localhost/jsp_prj/manage/css/dashboard.css"
+	rel="stylesheet">
+
+<link href="http://localhost/jsp_prj/manage/css/inquiries.css"
+	rel="stylesheet">
+</head>
+
+<body>
+	<div class="wrapper">
+
+		<!-- 사이드바 -->
+		<div class="sidebar">
+			<div class="logo">
+				<h3>
+					프레시마켓 <span>Admin</span>
+				</h3>
+			</div>
+
+			<ul>
+				<li><a href="../dashboard/dashboard.jsp"> Dashboard </a></li>
+				<li><a href="../Products/vieweditProducts.jsp"> Products </a></li>
+				<li><a href="../Categories/adminCategories.jsp"> Categories </a></li>
+				<li><a href="../order/adminOrder.jsp"> Order </a></li>
+				<li><a href="../user/adminUsers.jsp"> Users </a></li>
+				<li class="active"><a href="../inquiries/adminInquiries.jsp"> Inquiries </a></li>
+			</ul>
+
+			<div class="bottom-menu">
+				<ul>
+					<li><a href="../dashboard/settings.jsp"> Settings </a></li>
+					<li><a href="../login/login.jsp" class="logout">Logout</a></li>
+				</ul>
+			</div>
+		</div>
+
+		<!-- 메인 -->
+		<div class="main">
+
+			<!-- 헤더 -->
+			<div class="top-header">
+				<div>
+					<h3>대시보드</h3>
+					<span class="badge-custom"> 실시간 모니터링 </span>
+				</div>
+				<div class="update">마지막 업데이트 :</div>
+			</div>
+
+			<!-- 내용 -->
+			<div class="inquiry-wrap">
+
+				<!-- 왼쪽 문의 목록 -->
+				<div class="inquiry-list">
+					<div class="list-header">
+						<h4>문의 관리</h4>
+						<button class="wait-btn">대기 2건</button>
+					</div>
+					<div class="search-box">
+						<input type="text" placeholder="고객명, 제목 검색...">
+					</div>
+					<div class="filter-tabs">
+						<button class="active">전체</button>
+						<button>미처리</button>
+						<button>완료</button>
+					</div>
+					<div class="inquiry-items">
+						<div class="inquiry-item">
+							<div class="item-top">
+								<span class="category">배송문의</span> <span class="date">2024-05-21
+									09:15</span>
+							</div>
+							<div class="title">배송된 날짜가 일부러 배송이 왔습니다.</div>
+							<div class="item-bottom">
+								<span class="user">김정수</span> <span class="status waiting">미처리</span>
+							</div>
+						</div>
+						<div class="inquiry-item">
+							<div class="item-top">
+								<span class="category">배송문의</span> <span class="date">2024-05-21
+									10:30</span>
+							</div>
+							<div class="title">다음 주문 건의 문의드립니다.</div>
+							<div class="item-bottom">
+								<span class="user">이현민</span> <span class="status waiting">미처리</span>
+							</div>
+						</div>
+						<div class="inquiry-item">
+							<div class="item-top">
+								<span class="category">회원정보</span> <span class="date">2024-05-20
+									14:22</span>
+							</div>
+							<div class="title">회원 등급 산정 기준이 궁금해요.</div>
+							<div class="item-bottom">
+								<span class="user">박성훈</span> <span class="status complete">완료</span>
+							</div>
+						</div>
+					</div>
+				</div>
+
+				<!-- 오른쪽 상세 영역 -->
+				<div class="inquiry-detail">
+
+					<div id="emptyState" class="empty-state">
+						<!-- <div class="empty-icon">📩</div>
+						<h3>문의를 선택해주세요</h3>
+						<p>왼쪽 목록에서 문의를 클릭하면 상세 내용이 표시됩니다.</p> -->
+					</div>
+
+					<!-- 문의 선택 시 보임 -->
+					<div id="detailContent" style="display: none;">
+
+						<!-- 고객 정보 -->
+						<div class="customer-info">
+							<img src="../images/profile.png" class="profile">
+							<div>
+								<div class="customer-name">김철수</div>
+								<div class="customer-id">user_209384</div>
+							</div>
+						</div>
+
+						<!-- 문의 내용 -->
+						<div class="inquiry-content">
+							<div class="content-header">
+								<div>
+									<div class="category">배송 / 파손</div>
+									<h2>배송된 사과가 일부 파손되어 왔습니다.</h2>
+								</div>
+								<div class="date">2024-05-21 09:15</div>
+							</div>
+							<p class="question-text">어제 저녁에 주문한 사과 박스를 오늘 아침에 받았는데, 하단에
+								있는 사과 3개가 심하게 눌려서 왔네요. 신선식품이라 교환이나 환불 처리가 어떻게 되는지 궁금합니다.</p>
+							<div class="order-box">주문번호 ORD-9982 ></div>
+						</div>
+
+						<!-- 답변 작성 -->
+						<div class="reply-section">
+							<h4>답변 작성하기</h4>
+							<textarea placeholder="고객님께 전달할 답변을 입력해주세요..."></textarea>
+							<div class="reply-actions">
+								<button class="delete-btn">삭제</button>
+								<button class="reply-btn">답변 전송</button>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<script src="http://localhost/jsp_prj/manage/js/inquiries.js"></script>
+
+</body>
+
+</html>

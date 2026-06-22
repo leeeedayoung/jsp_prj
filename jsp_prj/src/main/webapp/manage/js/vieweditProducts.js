@@ -4,23 +4,18 @@ document.addEventListener("DOMContentLoaded", function () {
     resetBtn.addEventListener("click", function () {
         // 검색어 초기화
         document.getElementById("keyword").value = "";
-
         // 판매상태 -> 전체
         document.querySelector(
             "input[name='status'][value='all']"
         ).checked = true;
-
         // 카테고리 -> 전체
         document.getElementById("category").selectedIndex = 0;
-
         // 날짜 초기화
         document.getElementById("startDate").value = "";
         document.getElementById("endDate").value = "";
-
         // 기간 버튼 active 제거
         document.querySelectorAll(".date-btns button")
             .forEach(btn => btn.classList.remove("active"));
-
         // 기본값(3개월) 선택
         document.querySelectorAll(".date-btns button")[3]
             .classList.add("active");

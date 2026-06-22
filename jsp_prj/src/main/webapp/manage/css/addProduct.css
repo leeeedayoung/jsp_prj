@@ -1,0 +1,220 @@
+.sub-menu {
+    list-style: none;
+    margin: 8px 0 0 15px;
+    padding-left: 15px;
+    border-left: 2px solid #e5e7eb;
+}
+
+.sub-menu li {
+    margin: 5px 0;
+}
+
+.sub-menu li a {
+    display: block;
+    padding: 10px 15px;
+    color: #666;
+    text-decoration: none;
+    border-radius: 8px;
+    font-size: 14px;
+}
+
+.sub-menu li.active a {
+    background: #f3f4f6;
+    color: #333;
+    font-weight: 600;
+}
+
+.sub-menu li a:hover {
+    background: #f5f5f5;
+}
+
+.product-wrap{
+    width:95%;
+    margin:20px auto;
+    min-height:700px;
+    padding:20px;
+    position:relative;
+}
+
+.accordion-item{
+    border-bottom:1px solid #FFF;
+}
+
+.accordion-header{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    padding:18px 10px;
+    cursor:pointer;
+    font-size:14px;
+    font-weight:bold;
+    background:#fff;
+}
+
+.arrow{
+    font-size:12px;
+    color:#666;
+}
+
+.accordion-content{
+    display:none;
+    background:#FFF;
+    padding:20px;
+}
+
+.accordion-content.show{
+    display:block;
+}
+
+.form-row{
+    display:flex;
+    align-items:center;
+    margin-bottom:15px;
+}
+
+.form-row label{
+    width:120px;
+    font-weight:bold;
+}
+
+.form-row input,
+.form-row textarea{
+    flex:1;
+    padding:8px;
+    border:1px solid #FFF;
+    border-radius:4px;
+}
+
+.form-row textarea{
+    height:80px;
+    resize:none;
+}
+
+.required{
+    color:red;
+}
+
+.btn-area{
+    text-align:right;
+    margin-top:30px;
+}
+
+.save-btn{
+    background:#7CB342;
+    color:white;
+    border:none;
+    padding:8px 18px;
+    border-radius:4px;
+    cursor:pointer;
+}
+
+.input-group{
+    display: flex;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.input-group label{
+    width: 120px;
+    font-size: 14px;
+    font-weight: bold;
+    color: #333;
+}
+
+.input-group select{
+    width: 300px;
+    height: 40px;
+    padding: 0 10px;
+    border: 1px solid #dcdcdc;
+    border-radius: 4px;
+    font-size: 14px;
+    background: #fff;
+    outline: none;
+}
+
+.input-group select:focus{
+    border-color: #c67cff;
+}
+
+.input-row{
+    display:flex;
+    align-items:flex-start;
+    margin-bottom:20px;
+}
+
+.input-row label{
+    width:120px;
+    font-size:14px;
+    font-weight:bold;
+    padding-top:10px;
+}
+
+.input-box{
+    flex:1;
+    position:relative;
+}
+
+.input-box input,
+.input-box textarea{
+    width:100%;
+    border:1px solid #dcdcdc;
+    border-radius:4px;
+    padding:10px 60px 10px 10px;
+    font-size:14px;
+    box-sizing:border-box;
+}
+
+.input-box textarea{
+    height:70px;
+    resize:none;
+}
+
+.count{
+    position:absolute;
+    right:10px;
+    top:10px;
+    font-size:12px;
+    color:#999;
+}
+
+.sale-row{
+    display:flex;
+    align-items:center;
+    margin-bottom:20px;
+}
+
+.sale-row label{
+    width:150px;
+    font-size:14px;
+    color:#333;
+}
+
+.sale-input{
+    display:flex;
+    align-items:center;
+}
+
+.sale-input input{
+    width:140px;
+    height:32px;
+    padding:0 10px;
+    border:1px solid #cfcfcf;
+    border-radius:3px;
+    font-size:14px;
+    outline:none;
+    box-sizing:border-box;
+}
+
+.sale-input input:focus{
+    border-color:#8b5cf6;
+}
+
+.sale-input span{
+    margin-left:10px;
+    font-size:14px;
+    color:#333;
+}
+
+.required{
+    color:#ff4d4f;
+}
