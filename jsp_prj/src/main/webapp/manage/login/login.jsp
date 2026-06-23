@@ -115,17 +115,17 @@
 			d="M8 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8zM8 0a.5.5 0 0 1 .5.5v2a.5.5 0 0 1-1 0v-2A.5.5 0 0 1 8 0zm0 13a.5.5 0 0 1 .5.5v2a.5.5 0 0 1-1 0v-2A.5.5 0 0 1 8 13zm8-5a.5.5 0 0 1-.5.5h-2a.5.5 0 0 1 0-1h2a.5.5 0 0 1 .5.5zM3 8a.5.5 0 0 1-.5.5h-2a.5.5 0 0 1 0-1h2A.5.5 0 0 1 3 8zm10.657-5.657a.5.5 0 0 1 0 .707l-1.414 1.415a.5.5 0 1 1-.707-.708l1.414-1.414a.5.5 0 0 1 .707 0zm-9.193 9.193a.5.5 0 0 1 0 .707L3.05 13.657a.5.5 0 0 1-.707-.707l1.414-1.414a.5.5 0 0 1 .707 0zm9.193 2.121a.5.5 0 0 1-.707 0l-1.414-1.414a.5.5 0 0 1 .707-.707l1.414 1.414a.5.5 0 0 1 0 .707zM4.464 4.465a.5.5 0 0 1-.707 0L2.343 3.05a.5.5 0 1 1 .707-.707l1.414 1.414a.5.5 0 0 1 0 .708z"></path> </symbol> </svg>
 	
 	<main class="form-signin w-100 m-auto">
-		<form>
+		<form action="loginProcess.jsp" method="post">
 			<img class="mb-4" src="/docs/5.3/assets/brand/bootstrap-logo.svg"
 				alt="" width="72" height="57">
 			<h1 class="h3 mb-3 fw-normal" style="text-align: center; font-size: 25px; font-weight: bold;">로그인</h1>
 			<div class="form-floating">
-				<input type="email" class="form-control" id="floatingInput"
+				<input type="email" class="form-control" id="floatingInput" name="id"
 					placeholder="name@example.com"> <label for="floatingInput">
 					아이디를 입력해주세요</label>
 			</div>
 			<div class="form-floating">
-				<input type="password" class="form-control" id="floatingPassword"
+				<input type="password" class="form-control" id="floatingPassword" name="password"
 					placeholder="Password"> <label for="floatingPassword">비밀번호를 입력해주세요</label>
 			</div>
 			<button class="btn w-100 py-2" style="background-color: #7CB342" type="submit">

@@ -1,21 +1,15 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
 	pageEncoding="UTF-8"%>
-
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ page import="java.util.*"%>
-
 <%
 Boolean result = (Boolean)request.getAttribute("result");
 %>
-
 <!DOCTYPE html>
 <html>
-
 <head>
-
 <meta charset="UTF-8">
-
 <title>Settings</title>
-
 <link href="http://localhost/jsp_prj/manage/css/bootstrap.min.css"
 	rel="stylesheet">
 
@@ -24,11 +18,8 @@ Boolean result = (Boolean)request.getAttribute("result");
 
 <link href="http://localhost/jsp_prj/manage/css/settings.css"
 	rel="stylesheet">
-
 </head>
-
 <body>
-
 	<div class="wrapper">
 
 		<!-- 사이드바 -->
@@ -57,6 +48,11 @@ Boolean result = (Boolean)request.getAttribute("result");
 				</ul>
 			</div>
 		</div>
+		
+		<%
+		AdminService as=new AdminService();
+		pageContext.setAttribute("adminData", as.getAdminInfo());
+		%>
 
 		<!-- 메인 -->
 		<div class="main">
@@ -75,26 +71,28 @@ Boolean result = (Boolean)request.getAttribute("result");
 				<div class="personalInfo">
 					<h4>계정정보</h4>
 					<table class="info-table">
+						<c:forEach var="aDTO" items="${ userData }" varStatus="i">
 						<tr>
 							<th>이름</th>
-							<td>관리자</td>
+							<td><c:out value="${ aDTO.adminName }"/></td>
 							<%-- <td><%=admin.getAdminName()%></td> --%>
 						</tr>
 						<tr>
 							<th>아이디</th>
-							<td>manager</td>
+							<td><c:out value="${ aDTO.adminID }"/></td>
 							<%-- <td><%=admin.getAdminID()%></td> --%>
 						</tr>
 						<tr>
 							<th>연락처</th>
-							<td>010-1234-5678</td>
+							<td><c:out value="${ aDTO.adminTel }"/></td>
 							<%-- <td><%=admin.getAdminTel()%></td> --%>
 						</tr>
 						<tr>
 							<th>이메일</th>
-							<td>test@gmail.com</td>
+							<td><c:out value="${ aDTO.adminEmail }"/></td>
 							<%-- <td><%=admin.getAdminEmail()%></td> --%>
 						</tr>
+						</c:forEach>
 					</table>
 
 					<button class="password-btn" onclick="openPwModal()">비밀번호

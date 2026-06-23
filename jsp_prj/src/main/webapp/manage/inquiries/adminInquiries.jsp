@@ -141,7 +141,35 @@
 							</div>
 							<p class="question-text">어제 저녁에 주문한 사과 박스를 오늘 아침에 받았는데, 하단에
 								있는 사과 3개가 심하게 눌려서 왔네요. 신선식품이라 교환이나 환불 처리가 어떻게 되는지 궁금합니다.</p>
-							<div class="order-box">주문번호 ORD-9982 ></div>
+							<div class="order-box" onclick="openOrderModal('ORD-9982')">주문번호 ORD-9982 ></div>
+						</div>
+
+						<!-- 주문 상세 팝업 -->
+						<div id="orderModal" class="modal">
+							<div class="modal-content">
+								<span class="close" onclick="closeOrderModal()">&times;</span>
+								<h2>주문 상세 정보</h2>
+								<div class="order-info">
+									<p>
+										<strong>주문번호</strong> <span id="modalOrderNo"></span>
+									</p>
+									<p>
+										<strong>상품명</strong> 사과 5kg
+									</p>
+									<p>
+										<strong>수량</strong> 1개
+									</p>
+									<p>
+										<strong>결제금액</strong> 35,000원
+									</p>
+									<p>
+										<strong>주문일</strong> 2024-05-20
+									</p>
+									<p>
+										<strong>배송상태</strong> 배송완료
+									</p>
+								</div>
+							</div>
 						</div>
 
 						<!-- 답변 작성 -->

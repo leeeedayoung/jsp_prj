@@ -1,8 +1,14 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
 	pageEncoding="UTF-8"%>
-
 <%@ page import="java.util.*"%>
-
+<%
+String adminId = (String)session.getAttribute("adminId");
+if(adminId == null){
+    response.sendRedirect("../login/login.jsp");
+    return;
+}
+%>
+<%-- <%@ include file="../login/loginCheck.jsp" %> --%>
 <!DOCTYPE html>
 <html>
 <head>
@@ -28,7 +34,7 @@
 			</div>
 
 			<ul>
-				<li class="active"><a href="dashboard.jsp"> Dashboard </a></li>
+				<li class="active"><a href="dashboard.jsp?id=<%=adminId%>"> Dashboard </a></li>
 				<li><a href="../Products/vieweditProducts.jsp"> Products </a></li>
 				<li><a href="../Categories/adminCategories.jsp"> Categories
 				</a></li>
@@ -39,7 +45,7 @@
 			<div class="bottom-menu">
 				<ul>
 					<li><a href="settings.jsp"> Settings </a></li>
-					<li><a href="../login/login.jsp" class="logout">Logout</a></li>
+					<li><a href="../login/logout.jsp" class="logout">Logout</a></li>
 				</ul>
 			</div>
 		</div>

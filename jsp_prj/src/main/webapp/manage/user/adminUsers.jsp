@@ -141,7 +141,27 @@
 			</div>
 		</div>
 	</div>
+	<script src="http://localhost/jsp_prj/manage/js/bootstrap.bundle.min.js"></script>
 	<script src="http://localhost/jsp_prj/manage/js/user.js"></script>
+
+	<div class="modal fade" id="resetPasswordModal" tabindex="-1">
+		<div class="modal-dialog modal-dialog-centered">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h5 class="modal-title">비밀번호 초기화</h5>
+					<button type="button" class="btn-close" data-bs-dismiss="modal">
+					</button>
+				</div>
+				<div class="modal-body">새 비밀번호<br>xxxxxxxxxxxxxxx</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-secondary"
+						data-bs-dismiss="modal">Cancel</button>
+					<button type="button" class="btn btn-primary" id="resetConfirmBtn">
+						Confirm</button>
+				</div>
+			</div>
+		</div>
+	</div>
 
 </body>
 

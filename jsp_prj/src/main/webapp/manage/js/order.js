@@ -95,3 +95,27 @@ document.addEventListener("DOMContentLoaded", function(){
 		return `${year}-${month}-${day}`;
 	}
 });
+
+document.addEventListener("DOMContentLoaded", function () {
+    // 취소 요청
+    document.querySelectorAll(".cancel-btn").forEach(btn => {
+        btn.addEventListener("click", function () {
+            const modal =
+                new bootstrap.Modal(
+                    document.getElementById("cancelModal")
+                );
+            modal.show();
+        });
+    });
+
+    // 교환 요청
+    document.querySelectorAll(".claim-btn").forEach(btn => {
+        btn.addEventListener("click", function () {
+            const modal =
+                new bootstrap.Modal(
+                    document.getElementById("exchangeModal")
+                );
+            modal.show();
+        });
+    });
+});

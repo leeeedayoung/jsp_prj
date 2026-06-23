@@ -35,3 +35,18 @@ document.querySelectorAll(".inquiry-item").forEach(item => {
         // questionText.textContent = ...
     });
 });
+
+function openOrderModal(orderNo) {
+	document.getElementById("modalOrderNo").textContent = orderNo;
+	document.getElementById("orderModal").style.display = "block";
+}
+function closeOrderModal() {
+	document.getElementById("orderModal").style.display = "none";
+}
+// 팝업 바깥 영역 클릭 시 닫기
+window.onclick = function(event) {
+	const modal = document.getElementById("orderModal");
+	if (event.target == modal) {
+		modal.style.display = "none";
+	}
+}

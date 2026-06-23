@@ -31,3 +31,28 @@ rows.forEach(row => {
             this.dataset.grade;
     });
 });
+
+document.querySelector(".delete-btn")
+.addEventListener("click", function(){
+    const modal = new bootstrap.Modal(
+        document.getElementById("resetPasswordModal")
+    );
+    modal.show();
+});
+
+
+document.getElementById("resetConfirmBtn")
+.addEventListener("click", function(){
+    resetPassword();
+    const modal =
+        bootstrap.Modal.getInstance(
+            document.getElementById("resetPasswordModal")
+        );
+    modal.hide();
+});
+
+function resetPassword(){
+    // 나중에 AJAX 연결
+    // fetch("/resetPassword.do", ...)
+    console.log("비밀번호 초기화 완료");
+}

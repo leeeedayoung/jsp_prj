@@ -147,20 +147,135 @@
 							<td>2</td>
 							<td>배송완료</td>
 							<td>
-								<button class="cancel-btn">취소 요청</button>
+								<button class="cancel-btn" data-order-no="202506200002">취소 요청</button>
 							</td>
 						</tr>
 					</tbody>
 				</table>
 
 				<div class="bottom-btn">
-					<button type="button" id="deliveryBtn">배송처리</button>
+					<button type="button" id="deliveryBtn" data-order-no="202506200001">배송처리</button>
 				</div>
 
 			</div>
 		</div>
 	</div>
+	<script src="http://localhost/jsp_prj/manage/js/bootstrap.bundle.min.js"></script>
 	<script src="http://localhost/jsp_prj/manage/js/order.js"></script>
+
+	<!-- 취소 요청 상세 -->
+	<div class="modal fade" id="cancelModal" tabindex="-1">
+		<div class="modal-dialog modal-xl">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h5 class="modal-title">취소요청 상세</h5>
+					<button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+				</div>
+
+				<div class="modal-body">
+					<table class="table table-bordered">
+						<tr>
+							<th>클레임번호</th>
+							<td>81377</td>
+							<th>취소요청일시</th>
+							<td>2025-07-11 17:22:28</td>
+						</tr>
+						<tr>
+							<th>클레임상태</th>
+							<td>취소요청</td>
+							<th>구매자 연락처</th>
+							<td>010-1111-1111</td>
+						</tr>
+					</table>
+
+					<h6>취소요청 상품</h6>
+					<table class="table table-bordered">
+						<thead>
+							<tr>
+								<th>No</th>
+								<th>상품코드</th>
+								<th>상품명</th>
+								<th>단가</th>
+								<th>취소수량</th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr>
+								<td>1</td>
+								<td>1000036987</td>
+								<td>친환경 바른계란</td>
+								<td>8,000</td>
+								<td>2</td>
+							</tr>
+						</tbody>
+					</table>
+				</div>
+
+				<div class="modal-footer">
+					<button class="btn btn-danger">취소완료 처리</button>
+					<button class="btn btn-secondary" data-bs-dismiss="modal">닫기</button>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<!-- 교환 요청 상세 -->
+	<div class="modal fade" id="exchangeModal" tabindex="-1">
+		<div class="modal-dialog modal-xl">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h5 class="modal-title">교환 / 반품 요청 상세</h5>
+					<button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+				</div>
+				<div class="modal-body">
+					<table class="table table-bordered">
+						<tr>
+							<th>클레임번호</th>
+							<td>57724</td>
+							<th>클레임요청일</th>
+							<td>2025-07-03</td>
+						</tr>
+						<tr>
+							<th>주문자ID</th>
+							<td>홍길동</td>
+							<th>연락처</th>
+							<td>010-1234-5678</td>
+						</tr>
+					</table>
+					<h6>상품정보</h6>
+					<table class="table table-bordered">
+						<thead>
+							<tr>
+								<th>No</th>
+								<th>상품번호</th>
+								<th>상품명</th>
+								<th>상태</th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr>
+								<td>1</td>
+								<td>P20230401</td>
+								<td>친환경 바른계란</td>
+								<td>교환요청</td>
+							</tr>
+						</tbody>
+					</table>
+					<div class="mt-3">
+						<h6>상세사유</h6>
+						<textarea class="form-control" rows="4" readonly>
+						상품이 파손된 상태로 배송되었습니다.
+                    	</textarea>
+					</div>
+				</div>
+
+				<div class="modal-footer">
+					<button class="btn btn-primary">교환승인</button>
+					<button class="btn btn-secondary" data-bs-dismiss="modal">닫기</button>
+				</div>
+			</div>
+		</div>
+	</div>
 
 </body>
 
