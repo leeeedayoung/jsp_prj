@@ -1,8 +1,7 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
 	pageEncoding="UTF-8"%>
-
 <%@ page import="java.util.*"%>
-
+<%@ include file="../login/loginCheck.jsp" %>
 <!DOCTYPE html>
 <html>
 <head>
@@ -41,7 +40,7 @@
 			<div class="bottom-menu">
 				<ul>
 					<li><a href="../dashboard/settings.jsp"> Settings </a></li>
-					<li><a href="../login/login.jsp" class="logout">Logout</a></li>
+					<li><a href="../login/logout.jsp" class="logout">Logout</a></li>
 				</ul>
 			</div>
 		</div>

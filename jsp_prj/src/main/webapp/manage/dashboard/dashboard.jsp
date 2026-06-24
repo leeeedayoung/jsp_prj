@@ -1,14 +1,9 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
 	pageEncoding="UTF-8"%>
 <%@ page import="java.util.*"%>
-<%
-String adminId = (String)session.getAttribute("adminId");
-if(adminId == null){
-    response.sendRedirect("../login/login.jsp");
-    return;
-}
-%>
-<%-- <%@ include file="../login/loginCheck.jsp" %> --%>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
+<%@ include file="../login/loginCheck.jsp" %>
 <!DOCTYPE html>
 <html>
 <head>
@@ -34,7 +29,7 @@ if(adminId == null){
 			</div>
 
 			<ul>
-				<li class="active"><a href="dashboard.jsp?id=<%=adminId%>"> Dashboard </a></li>
+				<li class="active"><a href="dashboard.jsp"> Dashboard </a></li>
 				<li><a href="../Products/vieweditProducts.jsp"> Products </a></li>
 				<li><a href="../Categories/adminCategories.jsp"> Categories
 				</a></li>
@@ -49,7 +44,21 @@ if(adminId == null){
 				</ul>
 			</div>
 		</div>
+		
+		<%
+		DashBoardService dbs = new DashBoardService();
 
+		request.setAttribute("totalSales", dbs.getTotalSales());
+		request.setAttribute("newClientCount", dbs.getNewClientCount());
+		request.setAttribute("nowItemCount", dbs.getNowItemCount());
+		request.setAttribute("nonResponseCount", dbs.getNonResponseInquiryCount());
+
+		request.setAttribute("newClientStatistics", dbs.getNewClientStatistics());
+		request.setAttribute("dropOutClientStatistics", dbs.getDropOutClientStatistics());
+
+		request.setAttribute("bestProductList", dbs.getBestProductList());
+		%>
+		
 		<!-- 메인 -->
 		<div class="main">
 			<!-- 헤더 -->
@@ -66,25 +75,25 @@ if(adminId == null){
 				<div class="info-card">
 					<div class="title">연 총 매출</div>
 					<div class="value">
-						₩<%=request.getAttribute("totalSales")%>
+						₩ <fmt:formatNumber value="${ totalSales }" pattern="#,###,###"/>
 					</div>
 				</div>
 				<div class="info-card">
 					<div class="title">주간 신규 회원 수</div>
 					<div class="value">
-						<%=request.getAttribute("newClientWeek")%>건
+						<c:out value="${ newClientCount }"/>건
 					</div>
 				</div>
 				<div class="info-card">
 					<div class="title">현재 판매 중인 상품</div>
 					<div class="value">
-						<%=request.getAttribute("nowItemCount")%>개
+						<c:out value="${ nowItemCount }"/>개
 					</div>
 				</div>
 				<div class="info-card">
 					<div class="title">미답변 문의</div>
 					<div class="value">
-						<%=request.getAttribute("nonResponseInquiry")%>건
+						<c:out value="${ nonResponseCount }"/>건
 					</div>
 				</div>
 			</div>
@@ -99,15 +108,17 @@ if(adminId == null){
 			<div class="top5-card">
 				<h5>베스트 물품 Top5</h5>
 				<%
-				List<Map<String, Object>> bestProductList = (List<Map<String, Object>>) request.getAttribute("bestProductList");
-				if (bestProductList != null) {
+				List<Map<String, Object>> bestProductList = 
+					(List<Map<String, Object>>)request.getAttribute("bestProductList");
+				
+				if (bestProductList != null && !bestProductList.isEmpty()) {
 					for (int i = 0; i < bestProductList.size(); i++) {
 						Map<String, Object> product = bestProductList.get(i);
 				%>
 				<div class="top-product">
 					<div>
-						<%=i + 1%>.
-						<%=product.get("productName")%>
+						<%= i + 1 %>.
+						<%= product.get("productName") %>
 					</div>
 
 					<div>

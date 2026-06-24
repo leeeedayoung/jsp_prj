@@ -2,6 +2,7 @@
 	pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ page import="java.util.*"%>
+<%@ include file="../login/loginCheck.jsp" %>
 <%
 Boolean result = (Boolean)request.getAttribute("result");
 %>
@@ -43,7 +44,7 @@ Boolean result = (Boolean)request.getAttribute("result");
 				<ul>
 					<li class="active"><a href="settings.jsp"> Settings </a></li>
 					<li>
-						<a href="../login/login.jsp" class="logout">Logout</a>
+						<a href="../login/logout.jsp" class="logout">Logout</a>
 					</li>
 				</ul>
 			</div>
@@ -51,7 +52,9 @@ Boolean result = (Boolean)request.getAttribute("result");
 		
 		<%
 		AdminService as=new AdminService();
-		pageContext.setAttribute("adminData", as.getAdminInfo());
+		List<AdminDTO> list=as.getAdminInfo(adminId);
+		
+		pageContext.setAttribute("adminInfoList", list);
 		%>
 
 		<!-- 메인 -->
@@ -71,26 +74,22 @@ Boolean result = (Boolean)request.getAttribute("result");
 				<div class="personalInfo">
 					<h4>계정정보</h4>
 					<table class="info-table">
-						<c:forEach var="aDTO" items="${ userData }" varStatus="i">
+						<c:forEach var="adminInfo" items="${ adminInfoList }">
 						<tr>
 							<th>이름</th>
-							<td><c:out value="${ aDTO.adminName }"/></td>
-							<%-- <td><%=admin.getAdminName()%></td> --%>
+							<td><c:out value="${ adminInfo.adminName }"/></td>
 						</tr>
 						<tr>
 							<th>아이디</th>
-							<td><c:out value="${ aDTO.adminID }"/></td>
-							<%-- <td><%=admin.getAdminID()%></td> --%>
+							<td><c:out value="${ adminInfo.adminID }"/></td>
 						</tr>
 						<tr>
 							<th>연락처</th>
-							<td><c:out value="${ aDTO.adminTel }"/></td>
-							<%-- <td><%=admin.getAdminTel()%></td> --%>
+							<td><c:out value="${ adminInfo.adminTel }"/></td>
 						</tr>
 						<tr>
 							<th>이메일</th>
-							<td><c:out value="${ aDTO.adminEmail }"/></td>
-							<%-- <td><%=admin.getAdminEmail()%></td> --%>
+							<td><c:out value="${ adminInfo.adminEmail }"/></td>
 						</tr>
 						</c:forEach>
 					</table>
@@ -108,14 +107,14 @@ Boolean result = (Boolean)request.getAttribute("result");
 
 			<h4>비밀번호 변경</h4>
 
-			<label>현재 비밀번호</label> <input type="password" id="pw"> 
-			<label>새 비밀번호</label> <input type="password" id="newPw"> 
-			<label>새 비밀번호 확인</label> <input type="password" id="checkPw">
-
-			<p id="pwMsg"></p>
-
-			<button style="background-color: #7CB342" onclick="changePw()">확인</button>
-			<button onclick="closePwModal()">취소</button>
+			<form action="changePw.jsp" method="post" id="pwForm">
+				<label>현재 비밀번호</label> <input type="password" name="pw" id="pw">
+				<label>새 비밀번호</label> <input type="password" name="newPw" id="newPw">
+				<label>새 비밀번호 확인</label> <input type="password" id="checkPw">
+				<p id="pwMsg"></p>
+				<button type="button" onclick="changePw()">확인</button>
+				<button type="button" onclick="closePwModal()">취소</button>
+			</form>
 		</div>
 	</div>
 
@@ -144,21 +143,17 @@ Boolean result = (Boolean)request.getAttribute("result");
 		}
 		
 		function changePw() {
-			let pw = document.getElementById("pw").value;
-			let newPw = document.getElementById("newPw").value;
-			let checkPw = document.getElementById("checkPw").value;
 
-			if (newPw != checkPw) {
-				document.getElementById("pwMsg").innerHTML = "새 비밀번호가 일치하지 않습니다.";
-				return;
-			}
-			/* location.href = "changePw.do?pw=" + pw + "&newPw=" + newPw; */
-			document.getElementById("successModal")
-			.style.display = "flex";
-		}
+		    let newPw = document.getElementById("newPw").value;
+		    let checkPw = document.getElementById("checkPw").value;
 
-		function successConfirm(){
-			location.href="settings.jsp";
+		    if (newPw !== checkPw) {
+		        document.getElementById("pwMsg").innerHTML =
+		            "새 비밀번호가 일치하지 않습니다.";
+		        return;
+		    }
+
+		    document.getElementById("pwForm").submit();
 		}
 
 	</script>
@@ -171,13 +166,14 @@ Boolean result = (Boolean)request.getAttribute("result");
 		document.getElementById("successModal").style.display = "flex";
 	</script>
 	<%
-	} else {
+		} else {
 	%>
 	<script>
-		document.getElementById("pwMsg").innerHTML = "현재 비밀번호가 일치하지 않습니다.";
+		document.getElementById("pwModal").style.display = "flex";
+    	document.getElementById("pwMsg").innerHTML = "현재 비밀번호가 일치하지 않습니다.";
 	</script>
 	<%
-	}
+		}
 	}
 	%>
 </body>

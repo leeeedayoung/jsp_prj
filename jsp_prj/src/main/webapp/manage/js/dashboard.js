@@ -1,7 +1,5 @@
 /* globals Chart:false */
 
-
-
 (() => {
     'use strict';
     const canvas = document.getElementById("myChart");
