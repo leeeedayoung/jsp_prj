@@ -16,7 +16,7 @@ import lombok.ToString;
 public class MemberDTO {
 	
 	private int smsReceiveYN,emailReceiveYN;
-	private String memberCode,password,name,email,phone1,phone2,
+	private String id,password,name,email,phone1,phone2,
 	phone3,zipcode,address,address2,ip;
 	private String[] hobby;
 	
