@@ -1,7 +1,8 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
 	pageEncoding="UTF-8"%>
 <%@ page import="java.util.*"%>
-<%@ include file="../login/loginCheck.jsp" %>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%-- <%@ include file="../login/loginCheck.jsp" %> --%>
 <!DOCTYPE html>
 <html>
 <head>
@@ -22,34 +23,7 @@
 	<div class="wrapper">
 
 		<!-- 사이드바 -->
-		<div class="sidebar">
-			<div class="logo">
-				<h3>
-					프레시마켓 <span>Admin</span>
-				</h3>
-			</div>
-
-			<ul>
-				<li><a href="../dashboard/dashboard.jsp"> Dashboard </a></li>
-				<li><a href="../Products/vieweditProducts.jsp"> Products </a>
-					<ul class="sub-menu">
-						<li class="active"><a href="../Products/vieweditProducts.jsp">
-								View/Edit Products </a></li>
-						<li><a href="../Products/addProduct.jsp"> Add Product </a></li>
-					</ul></li>
-				<li><a href="../Categories/adminCategories.jsp"> Categories </a></li>
-				<li><a href="../order/adminOrder.jsp"> Order </a></li>
-				<li><a href="../user/adminUsers.jsp"> Users </a></li>
-				<li><a href="../inquiries/adminInquiries.jsp"> Inquiries </a></li>
-			</ul>
-
-			<div class="bottom-menu">
-				<ul>
-					<li><a href="../dashboard/settings.jsp"> Settings </a></li>
-					<li><a href="../login/logout.jsp" class="logout">Logout</a></li>
-				</ul>
-			</div>
-		</div>
+		<c:import url="../fragments/sidebar.jsp"></c:import>
 
 		<!-- 메인 -->
 		<div class="main">
@@ -57,10 +31,8 @@
 			<!-- 헤더 -->
 			<div class="top-header">
 				<div>
-					<h3>대시보드</h3>
-					<span class="badge-custom"> 실시간 모니터링 </span>
+					<h3>View/Edit Products</h3>
 				</div>
-				<div class="update">마지막 업데이트 :</div>
 			</div>
 
 			<!-- 내용 -->

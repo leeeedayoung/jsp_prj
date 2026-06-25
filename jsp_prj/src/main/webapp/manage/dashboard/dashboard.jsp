@@ -3,7 +3,7 @@
 <%@ page import="java.util.*"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
-<%@ include file="../login/loginCheck.jsp" %>
+<%-- <%@ include file="../login/loginCheck.jsp" %> --%>
 <!DOCTYPE html>
 <html>
 <head>
@@ -21,31 +21,9 @@
 	<div class="wrapper">
 
 		<!-- 사이드바 -->
-		<div class="sidebar">
-			<div class="logo">
-				<h3>
-					프레시마켓 <span>Admin</span>
-				</h3>
-			</div>
-
-			<ul>
-				<li class="active"><a href="dashboard.jsp"> Dashboard </a></li>
-				<li><a href="../Products/vieweditProducts.jsp"> Products </a></li>
-				<li><a href="../Categories/adminCategories.jsp"> Categories
-				</a></li>
-				<li><a href="../order/adminOrder.jsp"> Order </a></li>
-				<li><a href="../user/adminUsers.jsp"> Users </a></li>
-				<li><a href="../inquiries/adminInquiries.jsp"> Inquiries </a></li>
-			</ul>
-			<div class="bottom-menu">
-				<ul>
-					<li><a href="settings.jsp"> Settings </a></li>
-					<li><a href="../login/logout.jsp" class="logout">Logout</a></li>
-				</ul>
-			</div>
-		</div>
+		<c:import url="../fragments/sidebar.jsp"></c:import>
 		
-		<%
+		<%-- <%
 		DashBoardService dbs = new DashBoardService();
 
 		request.setAttribute("totalSales", dbs.getTotalSales());
@@ -57,17 +35,15 @@
 		request.setAttribute("dropOutClientStatistics", dbs.getDropOutClientStatistics());
 
 		request.setAttribute("bestProductList", dbs.getBestProductList());
-		%>
+		%> --%>
 		
 		<!-- 메인 -->
 		<div class="main">
 			<!-- 헤더 -->
 			<div class="top-header">
 				<div>
-					<h3>대시보드</h3>
-					<span class="badge-custom"> 실시간 모니터링 </span>
+					<h3>Dashboard</h3>
 				</div>
-				<div class="update">마지막 업데이트 : 14:32</div>
 			</div>
 
 			<!-- 카드 -->
