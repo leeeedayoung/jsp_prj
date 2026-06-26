@@ -44,6 +44,90 @@ public class MemberDAO {
 		}//end finally
 		
 		return idFlag;
-	}
+	}//selectId
+	
+	/**
+	 * 회원의 정보
+	 * @param mDTO
+	 * @throws SQLException
+	 */
+	public void insertWebMember(MemberDTO mDTO) throws SQLException{
+		//1.JDNI 사용객체 생성
+		//2.DBCP에서 DataSource 얻기
+		//3.DataSource에서 Connection 얻기
+		
+		Connection con=null;
+		PreparedStatement pstmt=null;
+		
+		GetConnection gc=GetConnection.getInstance();
+		try {
+			con=gc.getConn("dbcp");
+		//4.쿼리문 생성객체 얻기
+			StringBuilder insertMember=new StringBuilder();
+			insertMember
+			.append("insert into web_member")
+			.append("(ID, PASSWORD, NAME, EMAIL, PHONE, ZIPCODE, ADDRESS, ADDRESS2, IP, SMSRECEIVEYN, EMAILRECEIVEYN)")
+			.append("values(?,?,?,?,?,?,?,?,?,?,?)");
+			
+			pstmt=con.prepareStatement(insertMember.toString());
+			
+		//5.바인드 변수에 값 설정
+			pstmt.setString(1, mDTO.getId());
+			pstmt.setString(2, mDTO.getPassword());
+			pstmt.setString(3, mDTO.getName());
+			pstmt.setString(4, mDTO.getEmail());
+			pstmt.setString(5, mDTO.getPhone());
+			pstmt.setString(6, mDTO.getZipcode());
+			pstmt.setString(7, mDTO.getAddress());
+			pstmt.setString(8, mDTO.getAddress2());
+			pstmt.setString(9, mDTO.getIp());
+			pstmt.setInt(10, mDTO.getSmsReceiveYN());
+			pstmt.setInt(11, mDTO.getEmailReceiveYN());
+			
+		//6.쿼리문 실행 결과 얻기
+			pstmt.executeQuery();
+		} finally {
+		//7.연결 끊기
+			gc.dbClose(null, pstmt, con);
+		}//end finally
+	}//insertWebMember
+	
+	/**
+	 * 회원이 선택한 취미
+	 * @param mDTO
+	 * @throws SQLException
+	 */
+	public void insertWebMemberHobby(MemberDTO mDTO) throws SQLException{
+		Connection con=null;
+		PreparedStatement pstmt=null;
+		
+		GetConnection gc=GetConnection.getInstance();
+		try {
+			con=gc.getConn("dbcp");
+		//4.쿼리문 생성객체 얻기
+			StringBuilder insertMember=new StringBuilder();
+			insertMember
+			.append("insert into web_member_hobby")
+			.append("(ID, HOBBY)")
+			.append("values(?,?)");
+			
+			pstmt=con.prepareStatement(insertMember.toString());
+			
+		//5.바인드 변수에 값 설정
+			String[] hobby=mDTO.getHobby();
+//			if( hobby != null ) { //DAO => Service
+			for(int i=0; i<hobby.length; i++) {
+				pstmt.setString(1, mDTO.getId());
+				pstmt.setString(2, hobby[i]);
+				
+			//6.쿼리문 실행 결과 얻기
+				pstmt.executeQuery();
+			}//end for
+		} finally {
+		//7.연결 끊기
+			gc.dbClose(null, pstmt, con);
+		}//end finally
+	}//insertWebMemberHobby
+	
 	
 }//class

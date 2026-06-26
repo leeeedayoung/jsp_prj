@@ -162,7 +162,7 @@
 	</div>
 	<header data-bs-theme="dark">
 		<nav class="navbar navbar-expand-md navbar-dark fixed-top bg-dark">
-			<c:import url="${ CommonURL }/fragments/navigationBar.jsp"/>
+			<c:import url="/fragments/navigationBar.jsp"/>
 		</nav>
 	</header>
 	<main>

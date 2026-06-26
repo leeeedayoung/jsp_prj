@@ -17,7 +17,7 @@ public class MemberDTO {
 	
 	private int smsReceiveYN,emailReceiveYN;
 	private String id,password,name,email,phone1,phone2,
-	phone3,zipcode,address,address2,ip;
+	phone3,zipcode,address,address2,ip,phone;
 	private String[] hobby;
 	
 	private Date inputDate;
