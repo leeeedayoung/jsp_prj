@@ -8,14 +8,10 @@
 <head>
 <meta charset="UTF-8">
 <title>Add Product</title>
-<link href="http://localhost/jsp_prj/manage/css/bootstrap.min.css"
-	rel="stylesheet">
-
-<link href="http://localhost/jsp_prj/manage/css/dashboard.css"
-	rel="stylesheet">
-
-<link href="http://localhost/jsp_prj/manage/css/addProduct.css"
-	rel="stylesheet">
+<link href="http://localhost/jsp_prj/manage/css/bootstrap.min.css" rel="stylesheet">
+<link href="http://localhost/jsp_prj/manage/css/dashboard.css" rel="stylesheet">
+<link href="http://localhost/jsp_prj/manage/css/addProduct.css" rel="stylesheet">
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
 
 </head>
 
@@ -27,15 +23,12 @@
 
 		<!-- 메인 -->
 		<div class="main">
-
-			<!-- 헤더 -->
 			<div class="top-header">
 				<div>
 					<h3>AddProduct</h3>
 				</div>
 			</div>
-
-			<!-- 내용 -->
+			
 			<div class="product-wrap">
 				<div class="accordion">
 
@@ -69,7 +62,6 @@
 							<span>상품명 <span class="required">*</span></span> <span
 								class="arrow">&#9662;</span>
 						</div>
-
 						<div class="accordion-content">
 							<!-- 상품명 -->
 							<div class="input-row">
@@ -81,12 +73,9 @@
 									</span>
 								</div>
 							</div>
-							
 							<!-- 상품설명 -->
 							<div class="input-row">
-
 								<label for="productDesc">상품설명</label>
-
 								<div class="input-box">
 									<textarea id="productDesc" name="productDesc" maxlength="150"
 										placeholder="상품설명을 입력하세요."></textarea>
@@ -103,9 +92,7 @@
 							<span>판매정보 <span class="required">*</span></span> <span
 								class="arrow">&#9662;</span>
 						</div>
-
 						<div class="accordion-content">
-
 							<!-- 가격 -->
 							<div class="sale-row">
 								<label for="price">가격</label>
@@ -113,7 +100,6 @@
 									<input type="number" id="price" name="price"> <span>원</span>
 								</div>
 							</div>
-
 							<!-- 최소구매수량 -->
 							<div class="sale-row">
 								<label for="minQty">최소구매수량 <span class="required">*</span></label>
@@ -122,7 +108,6 @@
 									<span>개</span>
 								</div>
 							</div>
-
 							<!-- 최대구매수량 -->
 							<div class="sale-row">
 								<label for="maxQty">최대구매수량</label>
@@ -131,7 +116,6 @@
 										value="999999999" max="999999999"> <span>개</span>
 								</div>
 							</div>
-
 							<!-- 할인율 -->
 							<div class="sale-row">
 								<label for="discount">할인율</label>
@@ -148,7 +132,6 @@
 							<span>옵션 <span class="required">*</span></span> <span
 								class="arrow">&#9652;</span>
 						</div>
-
 						<div class="accordion-content show">
 							<div class="form-row">
 								<label>옵션명</label> <input type="text">

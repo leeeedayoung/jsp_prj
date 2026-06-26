@@ -19,6 +19,51 @@ Boolean result = (Boolean)request.getAttribute("result");
 
 <link href="http://localhost/jsp_prj/manage/css/settings.css"
 	rel="stylesheet">
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+
+<script>
+function openPwModal() {
+	document.getElementById("pwModal").style.display = "flex";
+}
+
+function closePwModal() {
+	document.getElementById("pwModal").style.display = "none";
+	document.getElementById("pw").value = "";
+	document.getElementById("newPw").value = "";
+	document.getElementById("checkPw").value = "";
+	document.getElementById("pwMsg").innerHTML = "";
+}
+
+function changePw() {
+	let newPw = document.getElementById("newPw").value;
+	let checkPw = document.getElementById("checkPw").value;
+
+	if (newPw !== checkPw) {
+		document.getElementById("pwMsg").innerHTML = "새 비밀번호가 일치하지 않습니다.";
+		return;
+	}
+	document.getElementById("pwForm").submit();
+}
+</script>
+<%
+if (result != null) {
+	if (result) {
+		%>
+		<script>
+		document.getElementById("successModal").style.display = "flex";
+		</script>
+	<%
+	} else {
+		%>
+		<script>
+		document.getElementById("pwModal").style.display = "flex";
+    	document.getElementById("pwMsg").innerHTML = "현재 비밀번호가 일치하지 않습니다.";
+		</script>
+	<%
+	}
+}
+%>
 </head>
 <body>
 	<div class="wrapper">
@@ -67,9 +112,7 @@ Boolean result = (Boolean)request.getAttribute("result");
 						</tr>
 						</c:forEach>
 					</table>
-
-					<button class="password-btn" onclick="openPwModal()">비밀번호
-						변경</button>
+					<button class="password-btn" onclick="openPwModal()">비밀번호 변경</button>
 				</div>
 			</div>
 		</div>
@@ -78,9 +121,7 @@ Boolean result = (Boolean)request.getAttribute("result");
 	<!-- 비밀번호 변경 -->
 	<div class="pw-modal" id="pwModal">
 		<div class="pw-box">
-
 			<h4>비밀번호 변경</h4>
-
 			<form action="changePw.jsp" method="post" id="pwForm">
 				<label>현재 비밀번호</label> <input type="password" name="pw" id="pw">
 				<label>새 비밀번호</label> <input type="password" name="newPw" id="newPw">
@@ -101,54 +142,5 @@ Boolean result = (Boolean)request.getAttribute("result");
 		</div>
 	</div>
 
-	<script>
-		function openPwModal() {
-			document.getElementById("pwModal").style.display = "flex";
-		}
-
-		function closePwModal() {
-			document.getElementById("pwModal").style.display = "none";
-
-			document.getElementById("pw").value = "";
-			document.getElementById("newPw").value = "";
-			document.getElementById("checkPw").value = "";
-
-			document.getElementById("pwMsg").innerHTML = "";
-		}
-		
-		function changePw() {
-
-		    let newPw = document.getElementById("newPw").value;
-		    let checkPw = document.getElementById("checkPw").value;
-
-		    if (newPw !== checkPw) {
-		        document.getElementById("pwMsg").innerHTML =
-		            "새 비밀번호가 일치하지 않습니다.";
-		        return;
-		    }
-
-		    document.getElementById("pwForm").submit();
-		}
-
-	</script>
-	<%
-	if (result != null) {
-
-		if (result) {
-	%>
-	<script>
-		document.getElementById("successModal").style.display = "flex";
-	</script>
-	<%
-		} else {
-	%>
-	<script>
-		document.getElementById("pwModal").style.display = "flex";
-    	document.getElementById("pwMsg").innerHTML = "현재 비밀번호가 일치하지 않습니다.";
-	</script>
-	<%
-		}
-	}
-	%>
 </body>
 </html>

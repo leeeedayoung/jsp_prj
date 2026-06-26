@@ -15,6 +15,40 @@
 
 <link href="http://localhost/jsp_prj/manage/css/dashboard.css"
 	rel="stylesheet">
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+
+<!-- 그래프에 사용할 배열 -->
+<script>
+const newClientData = [
+	<%
+	int[] newClient = (int[]) request.getAttribute("newClientStatistics");
+
+	if (newClient != null) {
+		for (int i = 0; i < newClient.length; i++) {
+			out.print(newClient[i]);
+			if (i != newClient.length - 1) {
+				out.print(",");
+			}//end if
+		}//end for
+	}//end if 
+	%>
+];
+
+const dropOutData = [
+	<%
+	int[] dropOut = (int[]) request.getAttribute("dropOutClientStatistics");
+
+	if (dropOut != null) {
+		for (int i = 0; i < dropOut.length; i++) {
+			out.print(dropOut[i]);
+			if (i != dropOut.length - 1) {
+				out.print(",");
+			}//end if
+		}//end for
+	}//end if
+	%>
+];
+</script>
 
 </head>
 <body>
@@ -84,8 +118,7 @@
 			<div class="top5-card">
 				<h5>베스트 물품 Top5</h5>
 				<%
-				List<Map<String, Object>> bestProductList = 
-					(List<Map<String, Object>>)request.getAttribute("bestProductList");
+				List<Map<String, Object>> bestProductList = (List<Map<String, Object>>)request.getAttribute("bestProductList");
 				
 				if (bestProductList != null && !bestProductList.isEmpty()) {
 					for (int i = 0; i < bestProductList.size(); i++) {
@@ -96,7 +129,6 @@
 						<%= i + 1 %>.
 						<%= product.get("productName") %>
 					</div>
-
 					<div>
 						<strong> <%=product.get("orderCount")%>건 →</strong>
 					</div>
@@ -108,35 +140,6 @@
 			</div>
 		</div>
 	</div>
-
-	<!-- js에서 사용할 배열 -->
-	<script>
-		const newClientData = [
-	<%int[] newClient = (int[]) request.getAttribute("newClientStatistics");
-
-	if (newClient != null) {
-		for (int i = 0; i < newClient.length; i++) {
-			out.print(newClient[i]);
-			if (i != newClient.length - 1) {
-				out.print(",");
-			}//end if
-		}//end for
-	}//end if %>
-		];
-
-		const dropOutData = [
-	<%int[] dropOut = (int[]) request.getAttribute("dropOutClientStatistics");
-
-	if (dropOut != null) {
-		for (int i = 0; i < dropOut.length; i++) {
-			out.print(dropOut[i]);
-			if (i != dropOut.length - 1) {
-				out.print(",");
-			}//end if
-		}//end for
-	}//end if%>
-		];
-	</script>
 
 	<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 	<script src="http://localhost/jsp_prj/manage/js/dashboard.js"></script>
