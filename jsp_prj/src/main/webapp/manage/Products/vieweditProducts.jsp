@@ -8,22 +8,92 @@
 <head>
 <meta charset="UTF-8">
 <title>View/Edit Products</title>
-<link href="http://localhost/jsp_prj/manage/css/bootstrap.min.css" rel="stylesheet">
-<link href="http://localhost/jsp_prj/manage/css/dashboard.css" rel="stylesheet">
-<link href="http://localhost/jsp_prj/manage/css/vieweditProducts.css" rel="stylesheet">
+<link href="../css/bootstrap.min.css" rel="stylesheet">
+<link href="../css/dashboard.css" rel="stylesheet">
+<link href="../css/vieweditProducts.css" rel="stylesheet">
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+<script>
+function resetSearch(){
+    document.getElementById("keyword").value = "";
+    document.querySelector("input[name='status'][value='all']").checked = true;
+    document.getElementById("category").selectedIndex = 0;
+    document.getElementById("startDate").value = "";
+    document.getElementById("endDate").value = "";
+    
+    let dateBtns = document.querySelectorAll(".date-btns button");
+    dateBtns.forEach(function(btn){
+        btn.classList.remove("active");
+    });
+    dateBtns[3].classList.add("active");
+} //resetSearch
 
+function selectPeriod(btn){
+    let dateBtns = document.querySelectorAll(".date-btns button");
+    dateBtns.forEach(function(item){
+        item.classList.remove("active");
+    });
+    btn.classList.add("active");
+}//selectPeriod
+
+function checkAllProducts(check){
+    let products = document.querySelectorAll(".productCheck");
+    products.forEach(function(item){
+        item.checked = check.checked;
+    });
+}//checkAllProducts
+
+function checkProduct(){
+    let products = document.querySelectorAll(".productCheck");
+    let checked = document.querySelectorAll(".productCheck:checked");
+    document.getElementById("checkAll").checked =
+        (products.length == checked.length);
+}//checkProduct
+
+function deleteProduct(){
+    let checked = document.querySelectorAll(".productCheck:checked");
+    if(checked.length == 0){
+        alert("삭제할 상품을 선택하세요.");
+        return;
+    }
+    if(!confirm("선택한 상품을 삭제하시겠습니까?")){
+        return;
+    }
+    let form = document.getElementById("deleteForm");
+    form.innerHTML = "";
+    checked.forEach(function(item){
+        let input = document.createElement("input");
+        input.type = "hidden";
+        input.name = "prdID";
+        input.value = item.value;
+        form.appendChild(input);
+    });
+    form.submit();
+}//deleteProduct
+
+function openEditModal(productNo, productName, stock){
+    document.getElementById("editProductNo").value = productNo;
+    document.getElementById("editName").value = productName;
+    document.getElementById("editStock").value = stock;
+    document.getElementById("editModal").style.display = "flex";
+}//openEditModal
+
+function closeEditModal(){
+    document.getElementById("editModal").style.display = "none";
+}//closeEditModal
+
+</script>
 </head>
 
 <body>
 	<div class="wrapper">
-
 		<!-- 사이드바 -->
 		<c:import url="../fragments/sidebar.jsp"></c:import>
 
 		<%
-		SearchProductService sps=new SearchProductService();
+		SearchProductService sps = new SearchProductService();
+		List<ProductDTO> productList = sps.searchItem("");
 
+		request.setAttribute("productList", productList);
 		request.setAttribute("totalCount", sps.countTotal());
 		request.setAttribute("onSaleCount", sps.countOnSale());
 		request.setAttribute("soldoutCount", sps.countSoldOut());
@@ -93,13 +163,13 @@
 						<div class="search-title">기간</div>
 						<div class="search-content">
 							<div class="date-btns">
-								<button>오늘</button>
-								<button>1주일</button>
-								<button>1개월</button>
-								<button class="active">3개월</button>
-								<button>6개월</button>
-								<button>1년</button>
-								<button>전체</button>
+								<button type="button" onclick="selectPeriod(this)">오늘</button>
+								<button type="button" onclick="selectPeriod(this)">1주일</button>
+								<button type="button" onclick="selectPeriod(this)">1개월</button>
+								<button type="button" class="active" onclick="selectPeriod(this)">3개월</button>
+								<button type="button" onclick="selectPeriod(this)">6개월</button>
+								<button type="button" onclick="selectPeriod(this)">1년</button>
+								<button type="button" onclick="selectPeriod(this)">전체</button>
 							</div>
 							<div class="date-input">
 								<input type="date" id="startDate"> ~ <input type="date" id="endDate">
@@ -108,7 +178,7 @@
 					</div>
 
 					<div class="search-button">
-						<button type="button" class="btn-reset">초기화</button>
+						<button type="button" class="btn-reset" onclick="resetSearch()">초기화</button>
 						<button type="button" class="btn-search">조회</button>
 					</div>
 				</div>
@@ -126,33 +196,31 @@
 				<table class="table table-bordered table-hover align-middle text-center">
 					<thead>
 						<tr>
-							<th><input type="checkbox" id="checkAll"></th>
+							<th><input type="checkbox" id="checkAll" onclick="checkAllProducts(this)"></th>
 							<th>수정</th>
 							<th>복사</th>
 							<th>상품번호</th>
 							<th>상품명</th>
 							<th>판매상태</th>
-							<th>재고수</th>
+							<th>재고</th>
 						</tr>
 					</thead>
 					<tbody>
 						<c:forEach var="product" items="${productList}">
 							<tr>
-								<td><input type="checkbox" class="productCheck"
-									value="${product.productNo}"></td>
+								<td><input type="checkbox" class="productCheck" onclick="checkProduct()"
+									value="${product.prdID}"></td>
 								<td>
-									<button class="btn btn-sm btn-outline-secondary edit-btn"
-										data-product-no="${product.productNo}"
-										data-name="${product.productName}"
-										data-status="${product.status}" data-stock="${product.stock}">
+									<button class="btn btn-sm btn-outline-secondary"
+										onclick="openEditModal('${product.prdID}','${product.prdName}','${product.stock}')">
 										수정</button>
 								</td>
 								<td>
 									<button class="btn btn-sm btn-warning copy-btn"
-										data-product-no="${product.productNo}">복사</button>
+										data-product-no="${product.prdID}">복사</button>
 								</td>
-								<td>${product.productNo}</td>
-								<td>${product.productName}</td>
+								<td>${product.prdID}</td>
+								<td>${product.prdName}</td>
 								<td>${product.status}</td>
 								<td>${product.stock}</td>
 							</tr>
@@ -170,8 +238,10 @@
 					<button>&gt;</button>
 				</div>
 
+				<form id="deleteForm" method="post" action="deleteProduct.jsp"></form>
+				
 				<div class="delete-btn">
-					<button id="deleteBtn">상품삭제</button>
+					<button type="button" id="deleteBtn" onclick="deleteProduct()">상품삭제</button>
 				</div>
 			</div>
 		</div>
@@ -181,12 +251,13 @@
 	<div id="editModal" class="modal-overlay">
 
 		<div class="modal-box">
+		 	<form action="changeProduct.jsp" method="post">
 			<div class="modal-header">
 				<span>상품 정보</span>
-				<button id="closeModal">&times;</button>
+				<button type="button" id="closeModal" onclick="closeEditModal()">&times;</button>
 			</div>
 			<div class="modal-body">
-				<input type="hidden" id="editProductNo">
+				<input type="hidden" id="editProductNo" name="prdID">
 				<div class="form-group">
 					<label>카테고리 <span class="required">*</span></label> <select
 						id="editCategory">
@@ -195,8 +266,8 @@
 					</select>
 				</div>
 				<div class="form-group">
-					<label>상품명 <span class="required">*</span></label> <input
-						type="text" id="editName">
+					<label>상품명 <span class="required">*</span></label>
+					<input type="text" id="editName" name="prdName">
 				</div>
 				<div class="form-group">
 					<label>판매 가격</label>
@@ -208,19 +279,18 @@
 					<label>재고 수량</label>
 					<div class="stock-box">
 						<button type="button" id="minusBtn">-</button>
-						<input type="text" id="editStock" value="5">
+						<input type="text" id="editStock" value="5" name="stock">
 						<button type="button" id="plusBtn">+</button>
 					</div>
 				</div>
 			</div>
 
 			<div class="modal-footer">
-				<button id="cancelBtn">취소</button>
+				<button type="button" id="cancelBtn" onclick="closeEditModal()">취소</button>
 				<button id="saveBtn">저장하기</button>
 			</div>
+			</form>
 		</div>
 	</div>
-	<script src="http://localhost/jsp_prj/manage/js/vieweditProducts.js"></script>
 </body>
-
 </html>

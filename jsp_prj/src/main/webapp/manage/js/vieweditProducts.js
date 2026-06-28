@@ -27,12 +27,10 @@ document.addEventListener("DOMContentLoaded", function () {
 
     dateButtons.forEach(function(btn) {
         btn.addEventListener("click", function() {
-
             // 기존 active 제거
             dateButtons.forEach(function(item) {
                 item.classList.remove("active");
             });
-
             // 현재 버튼 active 추가
             this.classList.add("active");
         });
@@ -40,32 +38,25 @@ document.addEventListener("DOMContentLoaded", function () {
 });
 
 const pageSize = document.getElementById("pageSize");
-
 pageSize.addEventListener("change", function() {
     let size = this.value;
-
     console.log(
         "페이지당 표시 개수 : " + size
     );
 });
 
 const searchBtn = document.querySelector(".btn-search");
-
 searchBtn.addEventListener("click", function(){
-
     let keyword =
         document.getElementById("keyword").value;
-
     let status =
         document.querySelector(
             "input[name='status']:checked"
         ).value;
-
     let category =
         document.getElementById("category").value;
-
     location.href =
-        "adminProducts.do"
+        "adminProducts.jsp"
         + "?keyword=" + keyword
         + "&status=" + status
         + "&category=" + category;
@@ -75,14 +66,11 @@ const copyButtons = document.querySelectorAll(".copy-btn");
 
 copyButtons.forEach(function(btn){
     btn.addEventListener("click", function(){
-
         let productNo = 
             this.dataset.productNo;
-
         let result = confirm(
             "해당 상품을 복사하시겠습니까?"
         );
-
         if(result){
             location.href =
             "productCopy.do?productNo="
@@ -92,9 +80,7 @@ copyButtons.forEach(function(btn){
 });
 
 const checkAll = document.getElementById("checkAll");
-
 const productChecks = document.querySelectorAll(".productCheck");
-
 checkAll.addEventListener("click", function(){
     productChecks.forEach(function(check){
         check.checked = checkAll.checked;
@@ -112,7 +98,6 @@ productChecks.forEach(function(check){
 });
 
 const deleteBtn = document.getElementById("deleteBtn");
-
 if(deleteBtn){
     deleteBtn.addEventListener("click", function(){
 
