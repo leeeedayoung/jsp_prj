@@ -8,10 +8,12 @@
 <head>
 <meta charset="UTF-8">
 <title>View/Edit Products</title>
+<link rel="shortcut icon" href="http://localhost/jsp_prj/manage/images/favicon.png"/>
 <link href="../css/bootstrap.min.css" rel="stylesheet">
 <link href="../css/dashboard.css" rel="stylesheet">
 <link href="../css/vieweditProducts.css" rel="stylesheet">
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+
 <script>
 function resetSearch(){
     document.getElementById("keyword").value = "";

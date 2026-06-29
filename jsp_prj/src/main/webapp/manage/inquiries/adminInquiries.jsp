@@ -8,14 +8,16 @@
 <head>
 <meta charset="UTF-8">
 <title>Inquiries</title>
-<link href="http://localhost/jsp_prj/manage/css/bootstrap.min.css"
-	rel="stylesheet">
+<link rel="shortcut icon" href="http://localhost/jsp_prj/manage/images/favicon.png"/>
+<link href="http://localhost/jsp_prj/manage/css/bootstrap.min.css" rel="stylesheet">
+<link href="http://localhost/jsp_prj/manage/css/dashboard.css" rel="stylesheet">
+<link href="http://localhost/jsp_prj/manage/css/inquiries.css" rel="stylesheet">
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
 
-<link href="http://localhost/jsp_prj/manage/css/dashboard.css"
-	rel="stylesheet">
+<script type="text/javascript">
 
-<link href="http://localhost/jsp_prj/manage/css/inquiries.css"
-	rel="stylesheet">
+</script>
+
 </head>
 
 <body>

@@ -8,67 +8,86 @@
 <head>
 <meta charset="UTF-8">
 <title>Categories</title>
-<link href="http://localhost/jsp_prj/manage/css/bootstrap.min.css" rel="stylesheet">
-<link href="http://localhost/jsp_prj/manage/css/dashboard.css" rel="stylesheet">
-<link href="http://localhost/jsp_prj/manage/css/categories.css" rel="stylesheet">
+<link rel="shortcut icon" href="http://localhost/jsp_prj/manage/images/favicon.png"/>
+<link href="../css/bootstrap.min.css" rel="stylesheet">
+<link href="../css/dashboard.css" rel="stylesheet">
+<link href="../css/categories.css" rel="stylesheet">
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
 
 <script>
-$(function(){
-    // 수정 버튼
-    $(".edit-btn").click(function(){
-        $("#editCategoryNo").val($(this).data("no"));
-        $("#editCategoryName").val($(this).data("name"));
-        $("#editCategoryStatus").val($(this).data("status"));
-        $("#editCategoryModal").css("display","flex");
-    });
+$(function() {
+	// 수정 버튼
+	$(".edit-btn").click(function() {
+		$("#editCategoryNo").val($(this).data("no"));
+		$("#editCategoryName").val($(this).data("name"));
+		$("#editCategoryModal").css("display", "flex");
+	});
 
-    // 수정 모달 닫기
-    $("#editCloseBtn,#editCancelBtn").click(function(){
-        $("#editCategoryModal").hide();
-    });
+	// 수정 모달 닫기
+	$("#editCloseBtn,#editCancelBtn").click(function() {
+		$("#editCategoryModal").hide();
+	});
 
-    // 추가 모달 열기
-    $("#addCategoryBtn").click(function(){
-        $("#categoryModal").css("display","flex");
-        $("#categoryName").val("");
-        $("#categoryName").focus();
-    });
+	// 추가 모달 열기
+	$("#addCategoryBtn").click(function() {
+		$("#categoryModal").css("display", "flex");
+		$("#categoryName").val("");
+		$("#categoryName").focus();
+	});
 
-    // 추가 모달 닫기
-    $("#closeModal,#cancelBtn").click(function(){
-        $("#categoryModal").hide();
-    });
+	// 추가 모달 닫기
+	$("#closeModal,#cancelBtn").click(function() {
+		$("#categoryModal").hide();
+	});
 
-    // 바깥 클릭
-    $(window).click(function(e){
-        if(e.target==$("#categoryModal")[0]){
-            $("#categoryModal").hide();
-        }
-        if(e.target==$("#editCategoryModal")[0]){
-            $("#editCategoryModal").hide();
-        }
-    });
+	// 바깥 클릭
+	$(window).click(function(e) {
+		if (e.target == $("#categoryModal")[0]) {
+			$("#categoryModal").hide();
+		}
+		if (e.target == $("#editCategoryModal")[0]) {
+			$("#editCategoryModal").hide();
+		}
+	});
 
-    // 추가 저장
-    $("#saveBtn").click(function(){
-        if($("#categoryName").val().trim()==""){
-            alert("카테고리명을 입력해주세요.");
-            $("#categoryName").focus();
-            return;
-        }
-        $("#addCategoryForm").submit();
-    });
+	// 추가 저장
+	$("#saveBtn").click(function() {
+		if($("#categoryName").val().trim() == "") {
+	        alert("카테고리명을 입력해주세요.");
+	        $("#categoryName").focus();
+	        return;
+	    }
+		$.ajax({
+			url : "addCategory.jsp",
+			type : "POST",
+			data : {
+				categoryName : $("#categoryName").val()
+			},
+			success : function() {
+				location.reload();
+			}
+		});
+	});
 
-    // 수정 저장
-    $("#editSaveBtn").click(function(){
-        if($("#editCategoryName").val().trim()==""){
-            alert("카테고리명을 입력해주세요.");
-            $("#editCategoryName").focus();
-            return;
-        }
-        $("#editCategoryForm").submit();
-    });
+	// 수정 저장
+	$("#editSaveBtn").click(function() {
+		if ($("#editCategoryName").val().trim() == "") {
+	        alert("카테고리명을 입력해주세요.");
+	        $("#editCategoryName").focus();
+	        return;
+	    }
+		$.ajax({
+	        url : "modifyCategory.jsp",
+	        type : "POST",
+	        data : {
+	            categoryId : $("#editCategoryNo").val(),
+	            categoryName : $("#editCategoryName").val(),
+	        },
+	        success : function() {
+	            location.reload();
+	        }
+	    });
+	});
 });
 </script>
 
@@ -80,31 +99,11 @@ $(function(){
 		<!-- 사이드바 -->
 		<c:import url="../fragments/sidebar.jsp"></c:import>
 
-		<%
-		request.setCharacterEncoding("UTF-8");
-
+		<%-- <%
 		CategoryService cs = new CategoryService();
-		String categoryData = cs.showCategory();
-
-		String mode = request.getParameter("mode");
-
-		if (mode != null) {
-			CategoryDTO cDTO = new CategoryDTO();
-			if ("add".equals(mode)) {
-				cDTO.setCategoryName(request.getParameter("categoryName"));
-				cs.addCategory(cDTO);
-				response.sendRedirect("adminCategories.jsp");
-				return;
-			}
-			if ("modify".equals(mode)) {
-				cDTO.setCategoryId(Integer.parseInt(request.getParameter("categoryId")));
-				cDTO.setCategoryName(request.getParameter("categoryName"));
-				cs.modifyCategory(cDTO);
-				response.sendRedirect("adminCategories.jsp");
-				return;
-			}
-		}
-		%>
+		List<CategoryDTO> categoryList=cs.showCategory();
+		pageContext.setAttribute("categoryList", categoryList);
+		%> --%>
 
 		<!-- 메인 -->
 		<div class="main">
@@ -113,35 +112,24 @@ $(function(){
 					<h3>Categories</h3>
 				</div>
 			</div>
-
 			<div class="product-wrap">
 				<div class="category-header">
 					<h4>카테고리</h4>
-					<span class="category-count">총 2개</span>
+					<span class="category-count">총 ${categoryList.size()}개</span>
 				</div>
-
 				<div class="category-list">
-					<div class="category-card">
-						<div class="category-left">
-							<span>&gt;</span>
-							<div class="category-info">
-								<span class="category-name"><%= categoryData %></span> <span class="status">활성</span>
-								<button class="edit-btn" data-no="1" data-name="채소"
-									data-status="Y">✎</button>
+					<c:forEach var="category" items="${categoryList}">
+						<div class="category-card">
+							<div class="category-left">
+								<span>&gt;</span>
+								<div class="category-info">
+									<span class="category-name">${category.categoryName}</span>
+									<button class="edit-btn" data-no="${category.categoryId}"
+										data-name="${category.categoryName}">✎</button>
+								</div>
 							</div>
 						</div>
-					</div>
-
-					<div class="category-card">
-						<div class="category-left">
-							<span>&gt;</span>
-							<div class="category-info">
-								<span class="category-name">과일</span> <span class="status">활성</span>
-								<button class="edit-btn" data-no="1" data-name="과일"
-									data-status="Y">✎</button>
-							</div>
-						</div>
-					</div>
+					</c:forEach>
 				</div>
 				<button class="add-category-btn" id="addCategoryBtn">＋ 카테고리 추가하기</button>
 			</div>
@@ -158,12 +146,9 @@ $(function(){
 				<span id="editCloseBtn" class="close">&times;</span>
 			</div>
 			<div class="modal-body">
-				<input type="hidden" id="editCategoryNo" name="categoryId"> <label>카테고리명</label>
-				<input type="text" id="editCategoryName" name="categoryName"> <label>상태</label>
-				<select id="editCategoryStatus">
-					<option value="Y">활성</option>
-					<option value="N">비활성</option>
-				</select>
+				<input type="hidden" id="editCategoryNo" name="categoryId">
+				<label>카테고리명</label>
+				<input type="text" id="editCategoryName" name="categoryName">
 			</div>
 			<div class="modal-footer">
 				<button type="button" class="cancel-btn" id="editCancelBtn">취소</button>
@@ -183,7 +168,8 @@ $(function(){
 				<span id="closeModal" class="close">&times;</span>
 			</div>
 			<div class="modal-body">
-				<label>카테고리명</label> <input type="text" id="categoryName" name="categoryName" placeholder="카테고리명을 입력하세요">
+				<label>카테고리명</label>
+				<input type="text" id="categoryName" name="categoryName" placeholder="카테고리명을 입력하세요">
 			</div>
 			<div class="modal-footer">
 				<button type="button" class="cancel-btn" id="cancelBtn">취소</button>

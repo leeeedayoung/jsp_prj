@@ -8,6 +8,7 @@
 <head>
 <meta charset="UTF-8">
 <title>Add Product</title>
+<link rel="shortcut icon" href="http://localhost/jsp_prj/manage/images/favicon.png"/>
 <link href="../css/bootstrap.min.css" rel="stylesheet">
 <link href="../css/dashboard.css" rel="stylesheet">
 <link href="../css/addProduct.css" rel="stylesheet">
