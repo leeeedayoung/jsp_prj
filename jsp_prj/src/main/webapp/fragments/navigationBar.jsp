@@ -28,10 +28,8 @@
 					</c:when>
 					<c:otherwise>
 						<a class="nav-link" style="color:#FFFFFF"
-							aria-current="page" href="#void">
-							
+							aria-current="page" href="${ CommonURL }/mypage/mypage.jsp">
 							<span title="${ userInfo.name }님의 마이페이지"><c:out value="${ userInfo.id }"/></span>님 로그인 하셨습니다.
-							
 							</a>&nbsp;&nbsp;
 						<a class="nav-link" style="color:#FFFFFF"
 							aria-current="page" href="#void">로그아웃</a>
