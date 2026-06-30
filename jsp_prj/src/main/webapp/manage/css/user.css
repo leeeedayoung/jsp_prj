@@ -124,15 +124,6 @@
     background:#f5f7ff;
 }
 
-.user-content{
-    display:flex;
-    gap:20px;
-}
-
-.user-list-box{
-    flex:1;
-}
-
 .user-detail{
     width:280px;
     background:#fff;

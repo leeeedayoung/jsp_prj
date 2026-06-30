@@ -15,7 +15,9 @@
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
 
 <script type="text/javascript">
-
+$(function(){
+	
+});
 </script>
 
 </head>
@@ -38,21 +40,17 @@
 
 			<!-- 내용 -->
 			<div class="order-wrap">
-
 				<h2 class="page-title">주문목록</h2>
 
 				<!-- 검색 영역 -->
 				<div class="search-box">
-
 					<div class="search-row">
 						<label>조회기간</label>
-
 						<button type="button" class="date-btn">오늘</button>
 						<button type="button" class="date-btn">1주일</button>
 						<button type="button" class="date-btn active">1개월</button>
 						<button type="button" class="date-btn">3개월</button>
-						<input type="date" id="startDate"> ~ <input type="date"
-							id="endDate">
+						<input type="date" id="startDate"> ~ <input type="date" id="endDate">
 					</div>
 
 					<div class="search-row">

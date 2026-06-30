@@ -16,106 +16,129 @@
 
 <script type="text/javascript">
 $(function(){
-    let selectedRow = null;
-    $(document).on("click", ".user-row", function(){
-        const detail = document.getElementById("userDetail");
-        if(selectedRow === this){
-            detail.style.display = "none";
-            $(this).removeClass("selected");
-            selectedRow = null;
-            return;
+    function searchUser(){
+        let keyword = $("#searchInput").val().toLowerCase().trim();
+
+        $(".user-row").each(function(){
+            let name = $(this).data("name").toLowerCase();
+            let email = $(this).data("email").toLowerCase();
+            let phone = $(this).data("phone");
+            if(name.includes(keyword) || email.includes(keyword) || phone.includes(keyword)){
+                $(this).show();
+            }else{
+                $(this).hide();
+            }
+        });
+    }//searchUser
+    
+    $("#searchBtn").click(function(){
+        searchUser();
+    });//click
+
+    $("#searchInput").keypress(function(e){
+        if(e.key === "Enter"){
+            searchUser();
         }
-        $(".user-row").removeClass("selected");
-        $(this).addClass("selected");
-        selectedRow = this;
-
-        detail.style.display = "block";
-        $("#detailName").text($(this).data("name"));
-        $("#detailEmail").text($(this).data("email"));
-        $("#detailPhone").text($(this).data("phone"));
-        $("#detailDate").text($(this).data("date"));
-        $("#detailGrade").text($(this).data("grade"));
     });
 
-    $(".delete-btn").click(function(){
-        new bootstrap.Modal(
-            document.getElementById("resetPasswordModal")
-        ).show();
+    $("#sortBtn").click(function(){
+        $("#sortMenu").toggle();
+    });//click
+
+    $("#sortMenu li").click(function(){
+        let type = $(this).data("sort");
+        let rows = $(".user-row").get();
+
+        rows.sort(function(a,b){
+            let aName = $(a).data("name");
+            let bName = $(b).data("name");
+            let aDate = new Date($(a).data("date"));
+            let bDate = new Date($(b).data("date"));
+
+            switch(type){
+                case "nameAsc": return aName.localeCompare(bName);
+                case "nameDesc": return bName.localeCompare(aName);
+                case "dateAsc": return aDate - bDate;
+                case "dateDesc": return bDate - aDate;
+            }
+        });
+
+        $(".user-table tbody").html(rows);
+        $("#sortMenu").hide();
     });
 
-    $("#resetConfirmBtn").click(function(){
-        resetPassword();
-        bootstrap.Modal.getInstance(
-            document.getElementById("resetPasswordModal")
-        ).hide();
-    });
-
-    function resetPassword(){
-        console.log("비밀번호 초기화 완료");
-    }//resetPassword
+    // 바깥 클릭 시 정렬 메뉴 닫기
+    $(document).click(function(e){
+        if(!$(e.target).closest(".sort-box").length){
+            $("#sortMenu").hide();
+        }
+    });//click
 });
 
 $(function(){
-	function searchUser() {
-	    let keyword = $("#searchInput").val().toLowerCase();
+	let selectedRow = null;
+    $(document).on("click",".user-row",function(){
+        let clientId=$(this).data("id");
+        // 같은 회원 다시 클릭하면 닫기
+        if(selectedRow === this){
+            $("#userDetail").hide();
+            $(this).removeClass("selected");
+            selectedRow = null;
+            return;
+        }//end if
+        $(".user-row").removeClass("selected");
+        $(this).addClass("selected");
+        selectedRow = this;
+        $.ajax({
+            url:"clientDetail.jsp",
+            type:"get",
+            data:{
+                clientId:clientId
+            },
+            success:function(data){
+                $("#detailName").text(data.name);
+                $("#detailEmail").text(data.email);
+                $("#detailPhone").text(data.phone);
+                $("#detailDate").text(data.joinDate);
+                $("#detailPayment").text(data.totalPayment);
+                $("#userDetail").show();
+                $("#resetPasswordBtn").data("id",clientId);
+            }
+        });//ajax
+    });
 	
-	    $(".user-row").each(function() {
-	        let name = $(this).data("name").toLowerCase();
-	        let email = $(this).data("email").toLowerCase();
-	        let phone = $(this).data("phone");
-	        if (name.includes(keyword) || email.includes(keyword) || phone.includes(keyword)) {
-	            $(this).show();
-	        } else {
-	            $(this).hide();
+	$("#resetPasswordBtn").click(function(){
+	    let clientId=$(this).data("id");
+	    $.ajax({
+	        url:"resetPassword.jsp",
+	        type:"get",
+	        data:{
+	            clientId:clientId
+	        },
+	        success:function(data){
+	            $("#newPassword").text(data.newPw);
+	            new bootstrap.Modal(document.getElementById("resetPasswordModal")).show();
 	        }
 	    });
-	}//searchUser
-	
-	// 버튼 검색
-	$("#searchBtn").click(function() {
-	    searchUser();
 	});
 	
-	// 엔터 검색
-	$("#searchInput").on("keypress", function(e) {
-	    if (e.key === "Enter") {
-	        searchUser();
-	    }
-	});
-	
-	$("#sortBtn").click(function() {
-	    $("#sortMenu").toggle();
-	});
-	
-	$("#sortMenu li").click(function() {
-	    let type = $(this).data("sort");
-	    let rows = $(".user-row").get();
-	
-	    rows.sort(function(a, b) {
-	        let aName = $(a).data("name");
-	        let bName = $(b).data("name");
-	        let aDate = new Date($(a).data("date").replace(/-/g,'/'));
-	        let bDate = new Date($(b).data("date").replace(/-/g,'/'));
-	
-	        switch(type) {
-	            case "nameAsc": return aName.localeCompare(bName);
-	            case "nameDesc": return bName.localeCompare(aName);
-	            case "dateAsc": return aDate - bDate;
-	            case "dateDesc": return bDate - aDate;
-	        }//end switch
+	$("#resetConfirmBtn").click(function(){
+	    let pw=$("#newPassword").text();
+	    $.ajax({
+	        url:"sendEmail.jsp",
+	        type:"get",
+	        data:{
+	        	clientId:clientId,
+	            newPw:pw
+	        },
+	        success:function(){
+	            alert("비밀번호 초기화 완료");
+	            bootstrap.Modal.getInstance(document.getElementById("resetPasswordModal")).hide();
+	        }
 	    });
-	    $(".user-table tbody").html(rows);
-	    $("#sortMenu").hide();
-	});
-	
-	$(document).click(function(e) {
-	    if (!$(e.target).closest(".sort-box").length) {
-	        $("#sortMenu").hide();
-	    }
 	});
 });
 </script>
-
 </head>
 
 <body>
@@ -126,8 +149,13 @@ $(function(){
 
 		<%-- <%
 		ClientService sc=new ClientService();
+		
+		int totalCount=sc.getTotalCount();
+		int newCount=sc.getNewCount();
 		List<ClientDTO> clientList=sc.getClientList();
 		
+		pageContext.setAttribute("totalCount", totalCount);
+		pageContext.setAttribute("newCount", newCount);
 		pageContext.setAttribute("clientList", clientList);
 		%> --%>
 
@@ -150,7 +178,7 @@ $(function(){
 						<div class="summary-icon">👥</div>
 						<div>
 							<div class="summary-title">전체 사용자</div>
-							<div class="summary-count">1,284명</div>
+							<div class="summary-count">${ totalCount }명</div>
 						</div>
 					</div>
 
@@ -158,7 +186,7 @@ $(function(){
 						<div class="summary-icon">📝</div>
 						<div>
 							<div class="summary-title">신규 가입</div>
-							<div class="summary-count">+42명</div>
+							<div class="summary-count">+${ newCount }명</div>
 						</div>
 					</div>
 				</div>
@@ -191,23 +219,16 @@ $(function(){
 								</tr>
 							</thead>
 							<tbody>
-
-								<tr class="user-row" data-name="김철수" data-email="test@test.com"
-									data-phone="010-1234-5678" data-date="2023-11-15"
-									data-grade="일반회원">
-									<td>김철수</td>
-									<td>test@test.com</td>
-									<td>010-1234-5678</td>
-									<td>2023-11-15</td>
+								<c:forEach var="client" items="${ clientList }">
+								<tr class="user-row" data-id="${ client.clientId }" 
+									data-name="${ client.clientName }" data-email="${ client.email }" 
+									data-phone="${ client.phone }" data-date="${ client.joinDate }">
+									<td>${ client.clientName }</td>
+									<td>${ client.email }</td>
+									<td>${ client.phone }</td>
+									<td>${ client.joinDate }</td>
 								</tr>
-								<tr class="user-row" data-name="이영희" data-email="test2@test.com"
-									data-phone="010-8375-1562" data-date="2024-01-20"
-									data-grade="VIP">
-									<td>이영희</td>
-									<td>test2@test.com</td>
-									<td>010-8375-1562</td>
-									<td>2024-01-20</td>
-								</tr>
+								</c:forEach>
 							</tbody>
 						</table>
 					</div>
@@ -218,16 +239,10 @@ $(function(){
 						<h4 id="detailName"></h4>
 						<p id="detailEmail"></p>
 						<hr>
-						<p>
-							📞 <span id="detailPhone"></span>
-						</p>
-						<p>
-							📅 <span id="detailDate"></span>
-						</p>
-						<p>
-							🏷 <span id="detailGrade"></span>
-						</p>
-						<button class="delete-btn">비밀번호 초기화</button>
+						<p>	📞 <span id="detailPhone"></span></p>
+						<p> 📅 <span id="detailDate"></span></p>
+						<p> 💰 <span id="detailPayment"></span></p>
+						<button class="delete-btn" id="resetPasswordBtn">비밀번호 초기화</button>
 					</div>
 				</div>
 			</div>
@@ -242,18 +257,15 @@ $(function(){
 					<button type="button" class="btn-close" data-bs-dismiss="modal">
 					</button>
 				</div>
-				<div class="modal-body">새 비밀번호<br>xxxxxxxxxxxxxxx</div>
+				<div class="modal-body">새 비밀번호<br><span id="newPassword"></span></div>
 				<div class="modal-footer">
-					<button type="button" class="btn btn-secondary"
-						data-bs-dismiss="modal">Cancel</button>
-					<button type="button" class="btn btn-primary" id="resetConfirmBtn">
-						Confirm</button>
+					<button type="button" class="btn btn-primary" id="resetConfirmBtn">확인</button>
+					<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">취소</button>
 				</div>
 			</div>
 		</div>
 	</div>
 	<script src="../js/bootstrap.bundle.min.js"></script>
-	<script src="http://localhost/jsp_prj/manage/js/user.js"></script>
 </body>
 
 </html>
