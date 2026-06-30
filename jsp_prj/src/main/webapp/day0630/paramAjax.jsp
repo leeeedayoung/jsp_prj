@@ -1,8 +1,8 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
 	pageEncoding="UTF-8"%>
-<%@ include file="../include/siteProperty.jsp" %>   
+<%@ include file="../include/siteProperty.jsp" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
-<%@ include file="../include/loginCheck.jsp"  %> 
+
 <!DOCTYPE html>
 <html lang="en" data-bs-theme="auto">
 <head>
@@ -10,11 +10,11 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="description" content="">
 <meta name="generator" content="Astro v5.13.2">
-<title>마이페이지</title>
+<title>Carousel Template · Bootstrap v5.3</title>
 
 <meta name="theme-color" content="#712cf9">
 
-<c:import url="${CommonURL}/fragments/external_file.jsp"/>
+<c:import url="${ CommonURL }/fragments/external_file.jsp"/>
 
 <style>
 .bd-placeholder-img {
@@ -98,49 +98,89 @@
 	display: block !important
 }
 
-#프로필 디자인
-#profileWrap{ width: 100%; min-height: 600px; margin-top: 20px;background-color: #FF0000 }
-
-
+.blue{color: #0000FF;}
+.red{color: #FF0000;}
 </style>
-
 <script type="text/javascript">
 $(function(){
-	//이미지 선택 버튼이 클릭
-	$("#btnPorfile").click(function(){
-		//버튼을 클릭했을 때 input type="file"을 클릭한 이벤트를 발생
-		$("#profile").click();
-	});//click
-	
-	$("#btnSearch").click(function(){
-		
-		var param={ id:"${userInfo.id}"}
-		
-		$.ajax({
-			url:"searchMyPage.jsp",
-			type:"post",
-			data:param,
-			dataType:"json",
-			error:function( xhr ){
-				console.log( xhr.status+" / "+ xhr.statusText )
-			},
-			success:function( jsonObj ){
-				//
-				$("#profile")[0].src
-					="${ CommonURL }${ uploadDir }/profile/"+jsonObj.profile;
-				$("#name").val(jsonObj.name);
-				$("#email").val(jsonObj.email);
-				$("#phone").val(jsonObj.phone);
-				$("#zipcode").val(jsonObj.zipcode);
-				$("#address").val(jsonObj.address);
-				$("#address2").val(jsonObj.address2);
-				$("#ip").html(jsonObj.ip);
-				$("#input_date").html(jsonObj.input_date);
-			}
-			
-		});
-	});//click
+	$("#btnQueryString").click(useQueryString);
+	$("#btnJSON").click(useJSON);
 });//ready
+
+function useQueryString(){
+	var name=$("#name").val();
+	var age=$("#age").val();
+	var addr=$("#addr").val();
+	
+	//QueryString 생성
+	var param="na="+name+"&age="+age+"&address="+addr+"&type=QueryString";
+	
+	$.ajax({
+		url : "ajaxParamProcess.jsp",
+		type : "get",
+		data : param,
+		dataType : "JSON",
+		error : function( xhr ){
+			console.log( xhr.status+" / "+ xhr.statusText );
+		},
+		success:function( jsonObj ){
+			//응답받은 데이터를 parsing 하여 사용.
+			var output="<div>"+jsonObj.type+" : "+jsonObj.userName+"/"
+				+jsonObj.userAge+"/"+jsonObj.userAddr+"</div>";
+			
+			//$("#output").html(output);
+			$("#output").append(output);
+			
+			//입력폼의 초기화
+			var name=$("#name").val("");
+			var age=$("#age").val("");
+			var addr=$("#addr").val("");
+		}
+	});
+}//useQueryString
+
+function useJSON(){
+	var name=$("#name").val();
+	var age=$("#age").val();
+	var addr=$("#addr").val();
+	
+	//JSONObject 생성
+	var param={na:name, age:age, address:addr, type:"JSONObject"};
+	
+	$.ajax({
+		url : "ajaxParamProcess.jsp",
+		type : "get",
+		data : param,
+		dataType : "JSON",
+		error : function( xhr ){
+			console.log( xhr.status+" / "+ xhr.statusText );
+		},
+		success:function( jsonObj ){
+			//응답받은 데이터를 parsing 하여 사용.
+			var output="<div>"+jsonObj.type+" : "+jsonObj.userName+"/"
+				+jsonObj.userAge+"/"+jsonObj.userAddr+"</div>";
+				
+			//JSONObject 안에 JSONArray를 parsing하여 반복시켜 JSONArray 안에
+			//JSONObject을 얻어서 파싱한다.
+			output+="<ul>"
+			$.each(jsonObj.data,function(i, jsonTemp){
+				//JSONArray안에 JSONObject을 얻어와서 Parsing
+				output+="<li>"+ jsonTemp.subject+"</li>"
+			});//each
+			output+="</ul>"
+			
+			//$("#output").html(output);
+			$("#output").append(output);
+			
+			//입력폼의 초기화
+			var name=$("#name").val("");
+			var age=$("#age").val("");
+			var addr=$("#addr").val("");
+		}
+	});
+}//useJSON
+
+
 </script>
 </head>
 <body>
@@ -203,87 +243,32 @@ $(function(){
 	</div>
 	<header data-bs-theme="dark">
 		<nav class="navbar navbar-expand-md navbar-dark fixed-top bg-dark">
-		<c:import url="/fragments/navigationBar.jsp"/>
+			<c:import url="${ CommonURL }/fragments/navigationBar.jsp"/>
 		</nav>
 	</header>
 	<main>
+		<div>
+		<h3>AJAX web parameter 전송</h3>
+		<label>이름</label><input type="text" id="name" name="name"/><br>
+		<label>나이</label><input type="text" id="age" name="age"/><br>
+		<label>주소</label><input type="text" id="addr" name="addr"/><br>
+		<input type="button" value="QueryString 형식" class="btn btn-sm btn-info"
+		 id="btnQueryString"/>
+		<input type="button" value="JSONObject 형식" class="btn btn-sm btn-primary"
+		 id="btnJSON"/>
+		
+		<div id="output" style="min-height: 200px; overflow: auto">
+		</div>
+		
+		</div>
 		
 		<!-- /.container -->
-		<div id="profileWrap" style="margin-top: 50px; ">
-		<form action="mypageProcess.jsp" method="post" id="mypageForm" name="mypageForm">
-		<table style="margin: 0px auto">
-		<tr>
-		<td style="vertical-align: top;width: 300px ">
-		<img src="${ CommonURL }${ uploadDir }/profile/default_profile.png"
-		 style="border-radius: 150px; width: 150px; height: 150px" id="profile"/><br>
-		 <input type="file" name="profile" id="profile" style="display: none;"/>
-		 <input type="button" value="이미지업로드" class="btn btn-success btn-sm"
-		  id="btnPorfile"/>
-		</td>
-		<td>
-		<h3>마이페이지- 정보수정</h3>
-		<table>
-		<tr>
-		<td>아이디</td>
-		<td><strong><c:out value="${ userInfo.id }"/></strong>
-			<input type="button" value="조회" class="btn btn-warning btn-sm"
-			id="btnSearch"/></td>
-		</tr>
-		<tr>
-		<td>이름</td>
-		<td><input type="text" id="name" name="name" value="" readonly="readonly"></td>
-		</tr>
-		<tr>
-		<td>이메일</td>
-		<td><input type="text" id="email" name="email" value=""></td>
-		</tr>
-		<tr>
-		<td>전화번호</td>
-		<td><input type="text" id="phone" name="phone" value=""></td>
-		</tr>
-		<tr>
-		<td>우편번호</td>
-		<td><input type="text" id="zipcode" name="zipcode" value="" style="width: 70px"
-				readonly="readonly"> 
-				<input type="button" value="검색" class="btn btn-success btn-sm"/></td>
-		</tr>
-		<tr>
-		<td>주소</td>
-		<td><input type="text" id="address" name="address" value="" style="width: 300px"
-				readonly="readonly"> 
-		</td>
-		</tr>
-		<tr>
-		<td>상세주소</td>
-		<td><input type="text" id="address2" name="address2" value="" style="width: 300px"/></td>
-		</tr>
-		<tr>
-		<td>가입 ip주소</td>
-		<td><span id="ip"></span></td>
-		</tr>
-		<tr>
-		<td>가입일</td>
-		<td><span id="input_date"></span></td>
-		</tr>
-		<tr>
-		<td colspan="2" align="center">
-			<input type="button" value="변경" class="btn btn-warning btn-sm" 
-			id="btnUpdate"/>
-		</td>
-		</tr>
-		
-		</table>
-		</td>
-		</tr>
-		</table>
-		</form>
-		</div>
 		<!-- FOOTER -->
 		<footer class="container">
-			<c:import url="${CommonURL}/fragments/footer.jsp"/>
+			<c:import url="${ CommonURL }/fragments/footer.jsp"/>
 		</footer>
 	</main>
-	<script src="${CommonURL}/common/js/bootstrap.bundle.min.js"
+	<script src="${ CommonURL }/common/js/bootstrap.bundle.min.js"
 		integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI"
 		class="astro-vvvwv3sm"></script>
 </body>
