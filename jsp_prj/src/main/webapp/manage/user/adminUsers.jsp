@@ -32,12 +32,14 @@ $(function(){
     }//searchUser
     
     $("#searchBtn").click(function(){
-        searchUser();
-    });//click
+        let keyword=$("#searchInput").val();
+        location.href="adminUsers.jsp?currentPage=1&keyword="+encodeURIComponent(keyword);
+    });
 
     $("#searchInput").keypress(function(e){
         if(e.key === "Enter"){
-            searchUser();
+            let keyword=$("#searchInput").val();
+            location.href="adminUsers.jsp?currentPage=1&keyword="+encodeURIComponent(keyword);
         }
     });
 
@@ -147,17 +149,48 @@ $(function(){
 		<!-- 사이드바 -->
 		<c:import url="../fragments/sidebar.jsp"></c:import>
 
-		<%-- <%
-		ClientService sc=new ClientService();
+		<jsp:useBean id="rDTO" class="kr.co.sist.client.RangeDTO" scope="page"/>
+		<jsp:setProperty name="rDTO" property="*"/>
+		<%
+		ClientService cs=new ClientService();
 		
-		int totalCount=sc.getTotalCount();
-		int newCount=sc.getNewCount();
-		List<ClientDTO> clientList=sc.getClientList();
+		String keyword = request.getParameter("keyword");
+		if(keyword != null){
+		    rDTO.setKeyword(keyword);
+		}
 		
-		pageContext.setAttribute("totalCount", totalCount);
-		pageContext.setAttribute("newCount", newCount);
-		pageContext.setAttribute("clientList", clientList);
-		%> --%>
+		String searchType = request.getParameter("searchType");
+		if(searchType == null){
+		    searchType = "all";
+		}
+		rDTO.setSearchType(searchType);
+		
+		String tempPage = request.getParameter("currentPage");
+		int currentPage = 1;
+		if(tempPage != null){
+		    currentPage = Integer.parseInt(tempPage);
+		}
+		int totalCount = cs.totalCount(rDTO);
+		int pageScale = cs.pageScale(10);
+		int totalPage = cs.totalPage(totalCount,pageScale);
+		int startNum = cs.startNum(currentPage,pageScale);
+		int endNum = cs.endNum(currentPage,pageScale);
+		
+		rDTO.setStartNum(startNum);
+		rDTO.setEndNum(endNum);
+		
+		List<ClientDTO> clientList = cs.getClientList();
+		
+		pageContext.setAttribute("clientList",clientList);
+		pageContext.setAttribute("currentPage",currentPage);
+		pageContext.setAttribute("totalCount",totalCount);
+		pageContext.setAttribute("pageScale",pageScale);
+		pageContext.setAttribute("totalPage",totalPage);
+		pageContext.setAttribute("startNum",startNum);
+		pageContext.setAttribute("endNum",endNum);
+
+		pageContext.setAttribute("newCount",cs.getNewCount());
+		%>
 
 		<!-- 메인 -->
 		<div class="main">
@@ -196,7 +229,7 @@ $(function(){
 					<!-- 왼쪽 -->
 					<div class="user-list-box">
 						<div class="search-area">
-							<input type="text" id="searchInput" placeholder="이름, 이메일, 전화번호 검색">
+							<input type="text" id="searchInput" value="${param.keyword}" placeholder="이름, 이메일, 전화번호 검색">
 							<button type="button" id="searchBtn">검색</button>
 							<div class="sort-box">
 								<button type="button" id="sortBtn">정렬 ⇔</button>
@@ -219,6 +252,11 @@ $(function(){
 								</tr>
 							</thead>
 							<tbody>
+								<c:if test="${ empty clientList }">
+								<tr>
+								<td colspan="4">사용자가 존재하지 않습니다.</td>
+								</tr>
+								</c:if>
 								<c:forEach var="client" items="${ clientList }">
 								<tr class="user-row" data-id="${ client.clientId }" 
 									data-name="${ client.clientName }" data-email="${ client.email }" 
@@ -231,6 +269,11 @@ $(function(){
 								</c:forEach>
 							</tbody>
 						</table>
+						<div id="divPagination" style="text-align:center">
+						<c:forEach var="i" begin="1" end="${totalPage}">
+						[<a href="adminUsers.jsp?currentPage=${i}">${i}</a>]
+						</c:forEach>
+						</div>
 					</div>
 
 					<!-- 오른쪽 -->
