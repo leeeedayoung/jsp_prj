@@ -1,6 +1,12 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
 	pageEncoding="UTF-8"%>
 <%@ include file="../include/siteProperty.jsp" %>
+<%-- <%@ include file="../include/loginCheck.jsp" %> --%>
+<% String sessionId="test"; 
+	String sessionName="테스트";
+	pageContext.setAttribute("userId", sessionId);
+	pageContext.setAttribute("userName", sessionName);
+%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 
 <!DOCTYPE html>
@@ -101,6 +107,37 @@
 .blue{color: #0000FF;}
 .red{color: #FF0000;}
 </style>
+<!-- include summernote css/js-->
+<link href="https://cdn.jsdelivr.net/npm/summernote@0.9.0/dist/summernote-lite.min.css" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/summernote@0.9.0/dist/summernote-lite.min.js"></script>
+
+<script type="text/javascript">
+$(function(){
+	$('#content').summernote({
+        placeholder: '자유롭게 글을 입력해주세요.',
+        tabsize: 2,
+        height: 400,
+        width: 600,
+        toolbar: [
+            // [groupName, [list of button]]
+            ['fontsize', ['fontsize']],
+            ['color', ['color']],
+            ['insert', ['picture']],
+          ]
+      });
+	
+	$("#btnWrite").click(chkNull);
+});//ready
+
+function chkNull(){
+	//alert($('#content').val()=="<p></p>")
+	if($('#title').val().trim() == ""){
+		alert("제목은 필수 입력입니다.");
+		return;
+	}//end if
+	$("#writeForm").submit();
+}//chkNull
+</script>
 </head>
 <body>
 	<svg xmlns="http://www.w3.org/2000/svg" class="d-none"> <symbol
@@ -166,20 +203,38 @@
 		</nav>
 	</header>
 	<main>
-		<div id="myCarousel" class="carousel slide mb-6"
-			data-bs-ride="carousel">
-			<c:import url="${ CommonURL }/fragments/carousel.jsp"/>
-		</div>
-		<!-- Marketing messaging and featurettes
-  ================================================== -->
-		<!-- Wrap the rest of the page in another container to center all the content. -->
-		<div class="container marketing">
-			<!-- Three columns of text below the carousel -->
-			<c:import url="${ CommonURL }/fragments/bestProduct.jsp"/>
-			<!-- /.row -->
-			<!-- START THE FEATURETTES -->
-			<c:import url="${ CommonURL }/fragments/productList.jsp"/>
-			<!-- /END THE FEATURETTES -->
+		<div id="divWriteForm" style="margin-top: 20px">
+		
+		<form action="boardWriteFormProcess.jsp" method="post" name="writeForm" id="writeForm">
+		<table>
+		<tr>
+		<th colspan="2" style="text-align: center"><h3>아무말 대잔치 글쓰기</h3></th>
+		</tr>
+		<tr>
+		<td width="120px">제목</td>
+		<td><input type="text" name="title" id="title" style="width: 600px"></td>
+		</tr>
+		<tr>
+		<td>내용</td>
+		<td><textarea name="content" id="content"></textarea></td>
+		</tr>
+		<tr>
+		<td>작성자</td>
+		<td><c:out value="${ userId }(${ userName }님)"/></td>
+		</tr>
+		<tr>
+		<td>ip</td>
+		<td><%= request.getRemoteAddr() %></td>
+		</tr>
+		<tr>
+		<td colspan="2" align="center">
+		<input type="button" value="글작성" class="btn btn-sm btn-success" id="btnWrite"/>
+		<a href="javascript:history.back()" class="btn btn-sm btn-info">리스트</a>
+		</td>
+		</tr>
+		</table>
+		</form>
+		
 		</div>
 		<!-- /.container -->
 		<!-- FOOTER -->

@@ -1,7 +1,11 @@
+<%@page import="kr.co.sist.board.BoardDTO"%>
+<%@page import="java.util.List"%>
+<%@page import="kr.co.sist.board.BoardService"%>
 <%@ page language="java" contentType="text/html; charset=UTF-8"
    pageEncoding="UTF-8"%>
 <%@ include file="../include/siteProperty.jsp" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 
 <!DOCTYPE html>
 <html lang="en" data-bs-theme="auto">
@@ -14,10 +18,6 @@
 
 <meta name="theme-color" content="#712cf9">
 
-<script src="http://localhost/jsp_prj/common/js/color-modes.js"></script>
-<link href="http://localhost/jsp_prj/common/css/bootstrap.min.css" rel="stylesheet">
-<link href="http://localhost/jsp_prj/common/css/carousel.css" rel="stylesheet">
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
 <c:import url="${CommonURL}/fragments/external_file.jsp"/>
 
 <style>
@@ -104,11 +104,9 @@
 
 .blue{color: #0000FF;}
 .red{color: #FF0000;}
+
+a { color: #858585; text-decoration: none;}
 </style>
-<script type="text/javascript">
-//var obj=new XMLHttpRequest();
-//alert(obj);
-</script>
 </head>
 <body>
    <svg xmlns="http://www.w3.org/2000/svg" class="d-none"> <symbol
@@ -174,24 +172,97 @@
       </nav>
    </header>
    <main>
-      <div id="myCarousel" class="carousel slide mb-6"
-         data-bs-ride="carousel">
-        <c:import url="${CommonURL}/fragments/carousel.jsp"/>
-      </div>
-      <div>
-      <a href="${CommonURL }/board/boardList.jsp">게시판</a>
-      </div>
-      <!-- Marketing messaging and featurettes
-  ================================================== -->
-      <!-- Wrap the rest of the page in another container to center all the content. -->
-      <div class="container marketing">
-         <!-- Three columns of text below the carousel -->
-         <c:import url="${CommonURL}/fragments/bestProduct.jsp"/>
-         <!-- /.row -->
-         <!-- START THE FEATURETTES -->
-         <c:import url="${CommonURL}/fragments/productList.jsp"/>
-         <!-- /END THE FEATURETTES -->
-      </div>
+   <div id="boardDiv" style="margin-top: 20px">
+   <jsp:useBean id="rDTO" class="kr.co.sist.board.RangeDTO" scope="page"/>
+   <jsp:setProperty name="rDTO" property="*"/>
+   <%
+   BoardService bs=new BoardService();
+   //1. 총 레코드 수
+   int totalCount=0;
+   totalCount=bs.totalCount();
+   //2. 한 화면에 보여질 게시글의 수
+   int pageScale=10;
+   //3. 총 페이지 수
+   int totalPage=(int)Math.ceil((double)totalCount/pageScale);
+   
+   //4. 시작번호 구하기
+   String tempPage=request.getParameter("currentPage");
+   int currentPage=1;
+   
+   if(tempPage!=null){//pagination을 클릭했을 때 1,2,3,4 해당 페이지 번호가 입력
+	   currentPage=Integer.parseInt(tempPage);
+   }//end if
+   
+   int startNum=1;
+   startNum=currentPage*pageScale-pageScale+1;
+   
+   //5.선택한 페이지의 끝번호 구하기
+   int endNum=startNum+pageScale-1;
+   
+   rDTO.setStartNum(startNum);
+   rDTO.setEndNum(endNum);
+   
+   List<BoardDTO> listBoard=bs.searchBoard(rDTO);
+   
+   pageContext.setAttribute("totalCount", totalCount);
+   pageContext.setAttribute("pageScale", pageScale);
+   pageContext.setAttribute("totalPage", totalPage);
+   pageContext.setAttribute("startNum", startNum);
+   pageContext.setAttribute("endNum", endNum);
+   pageContext.setAttribute("currentPage", currentPage);
+   pageContext.setAttribute("listBoard", listBoard);
+   %>
+   <%-- 총 레코드 수: ${totalCount }건<br>
+   한 화면에 보여질 게시글의 수: ${pageScale }건<br>
+   총 페이지 수: ${totalPage }장<br>
+   현재 페이지: ${currentPage }장<br>
+   시작 번호: ${startNum }<br>
+   끝 번호: ${endNum }<br> --%>
+   <div id="divBoardHeader">
+   <c:if test="${ not empty userInfo }">
+   <a href="boardWriteForm.jsp" class="btn btn-success btn-sm">글작성</a>
+   </c:if>
+   </div>
+   <div id="divBoardContent" style="height: 500px">
+   <table class="table table-hover">
+   <thead>
+   <tr>
+   <th style="width: 80px">번호</th>
+   <th style="width: 400px">제목</th>
+   <th style="width: 130px">작성자</th>
+   <th style="width: 150px">작성일</th>
+   <th style="width: 80px">조회수</th>
+   </tr>
+   </thead>
+   <tbody>
+   <c:if test="${ empty listBoard }">
+   <tr>
+   <td colspan="5" style="text-align: center">게시글이 없습니다.</td>
+   </tr>
+   </c:if>
+   <c:forEach var="bDTO" items="${listBoard }" varStatus="i">
+   <tr>
+   <td><c:out value="${ totalCount-(currentPage-1)*pageScale-i.index }"/></td>
+   <td><a href="boardDetail.jsp?num=${ bDTO.num }&currentPage=${currentPage}"><c:out value="${ bDTO.title }"/></a></td>
+   <td><c:out value="${ bDTO.id }"/></td>
+   <td><fmt:formatDate value="${ bDTO.input_date }" pattern="yyyy-MM-dd kk:mm:ss"/></td>
+   <td><c:out value="${ bDTO.cnt }"/></td>
+   </tr>
+   </c:forEach>
+   
+   </tbody>
+   </table>
+   </div>
+   <div id="divSearchForm" style="height: 80px">
+   
+   </div>
+   <div id="divPagination" style="text-align: center">
+	   <c:forEach var="i" begin="1" end="${totalPage }" step="1">
+	   [<a href="boardList.jsp?currentPage=${i }">${i }</a>]
+	   </c:forEach>
+   </div>
+   
+   </div>
       <!-- /.container -->
       <!-- FOOTER -->
       	<footer class="container">
