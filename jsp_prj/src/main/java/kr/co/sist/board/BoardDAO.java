@@ -26,7 +26,7 @@ public class BoardDAO {
 		return mpDAO;
 	}//getInstance
 	
-	public int selectTotalCount()throws SQLException {
+	public int selectTotalCount(RangeDTO rDTO)throws SQLException {
 		int totalCount=0;
 		
 		Connection con=null;
@@ -39,9 +39,21 @@ public class BoardDAO {
 			//커넥션얻기
 			con=gc.getConn("dbcp");
 			//쿼리문 수행 객체 얻기
-			String selectTotal="select count(*) cnt from board";
-			pstmt=con.prepareStatement(selectTotal);
+			StringBuilder selectTotal=new StringBuilder();
+			selectTotal.append("select count(*) cnt from board ");
+			
+			if(rDTO.getKeyword() != null && !rDTO.getKeyword().isEmpty()) {
+				//검색 키원드가 있을 때 쿼리문이 변경되어야 한다. (동적 쿼리에 생성기준)
+				selectTotal.append("where instr(").append(rDTO.getField())
+				.append(",?) != 0");
+			}//end if
+			
+			pstmt=con.prepareStatement(selectTotal.toString());
 			//바인드 변수에 값 설정
+			if(rDTO.getKeyword() != null && !rDTO.getKeyword().isEmpty()) {
+				//검색 키원드가 있을 때 바인드 변수에 값이 설정되어야 한다.
+				pstmt.setString(1, rDTO.getKeyword());
+			}//end if
 			
 			//쿼리문 실행 후 결과 얻기
 			rs=pstmt.executeQuery();
@@ -73,13 +85,26 @@ public class BoardDAO {
 			.append("	select num, id, title, input_date,cnt						")
 			.append("	from (select NUM, ID, TITLE, INPUT_DATE, CNT,				")
 			.append("			row_number() over( order by input_date desc) rnum	")
-			.append("			from board)											")
-			.append("	where rnum between ? and ?									");
+			.append("			from board											");
+			
+			if(rDTO.getKeyword() != null && !rDTO.getKeyword().isEmpty()) {
+				selectBoard.append(" where instr(")
+				.append(rDTO.getField()).append(",?) != 0 ");
+			}//end if
+			
+			selectBoard.append("	) where rnum between ? and ?					");
 			pstmt=con.prepareStatement(selectBoard.toString());
 			//바인드 변수에 값 설정
 			
-			pstmt.setInt(1, rDTO.getStartNum());
-			pstmt.setInt(2, rDTO.getEndNum());
+			//System.out.println(selectBoard);
+			
+			int bindInd=0;
+			if(rDTO.getKeyword() != null && !rDTO.getKeyword().isEmpty()) {
+				pstmt.setString(++bindInd, rDTO.getKeyword());
+			}//end if
+			
+			pstmt.setInt(++bindInd, rDTO.getStartNum());
+			pstmt.setInt(++bindInd, rDTO.getEndNum());				
 			
 			//쿼리문 실행 후 결과 얻기
 			rs=pstmt.executeQuery();

@@ -1,9 +1,10 @@
-<%@page import="kr.co.sist.board.BoardService"%>
+<%@page import="com.oreilly.servlet.multipart.DefaultFileRenamePolicy"%>
+<%@page import="java.io.File"%>
+<%@page import="com.oreilly.servlet.MultipartRequest"%>
 <%@ page language="java" contentType="text/html; charset=UTF-8"
 	pageEncoding="UTF-8"%>
 <%@ include file="../include/siteProperty.jsp" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
-<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 
 <!DOCTYPE html>
 <html lang="en" data-bs-theme="auto">
@@ -103,69 +104,6 @@
 .blue{color: #0000FF;}
 .red{color: #FF0000;}
 </style>
-<!-- include summernote css/js-->
-<link href="https://cdn.jsdelivr.net/npm/summernote@0.9.0/dist/summernote-lite.min.css" rel="stylesheet">
-<script src="https://cdn.jsdelivr.net/npm/summernote@0.9.0/dist/summernote-lite.min.js"></script>
-
-<script type="text/javascript">
-$(function(){
-	$('#content').summernote({
-        placeholder: '자유롭게 글을 입력해주세요.',
-        tabsize: 2,
-        height: 400,
-        width: 600,
-        toolbar: [
-            // [groupName, [list of button]]
-            ['fontsize', ['fontsize']],
-            ['color', ['color']],
-            ['insert', ['picture']],
-          ]
-      });
-	
-	$("#btnWrite").click(chkNull);
-	$("#btnUpdate").click(function(){
-		boardModify('u');
-	});
-	
-	$("#btnDelete").click(function(){
-		boardModify('d');
-	});
-	
-});//ready
-
-function chkNull(){
-	//alert($('#content').val()=="<p></p>")
-	if($('#title').val().trim() == ""){
-		alert("제목은 필수 입력입니다.");
-		return;
-	}//end if
-	$("#writeForm").submit();
-}//chkNull
-
-function boardModify(jobFlag){
-	
-	var action="deleteBoard";
-	var msg="삭제";
-	if(jobFlag == 'u'){
-		action="updateBoard";
-		msg="변경";
-	}//end if
-	
-	if(confirm("글을 "+msg+"하시겠습니까?")){
-		//폼태그를 얻어서, action 속성을 변경하고, submit 실행
-		$("#readForm")[0].action=action+".jsp";
-		//유효성 검증
-		if(msg=="변경"){
-			if($("#title").val().trim() == ""){
-				alert("제목은 필수 입력입니다.");
-				return;
-			}//end if
-		}//end if
-		$("#readForm").submit();
-	}//end if
-}//boardModify
-
-</script>
 </head>
 <body>
 	<svg xmlns="http://www.w3.org/2000/svg" class="d-none"> <symbol
@@ -227,80 +165,26 @@ function boardModify(jobFlag){
 	</div>
 	<header data-bs-theme="dark">
 		<nav class="navbar navbar-expand-md navbar-dark fixed-top bg-dark">
-			<c:import url="/fragments/navigationBar.jsp"/>
+			<c:import url="${ CommonURL }/fragments/navigationBar.jsp"/>
 		</nav>
 	</header>
 	<main>
-		<div id="divWriteForm" style="margin-top: 20px">
+		<div style="margin-top: 50px">
 		<%
-		String paramNum=request.getParameter("num");
+		//파일을 저장할 디렉토리 설정
+		File saveDir=
+			new File("C:/Users/user/git/jsp_prj/jsp_prj/src/main/webapp/upload");
+		//업로드 파일의 최대 크기 설정 //10Mbyte
+		int maxSize=1024*1024*10;
 		
-		int num=0;
-		if(paramNum != null){
-			try{
-				num=Integer.parseInt(paramNum);
-			}catch(NumberFormatException nfe){
-				response.sendRedirect("../error/err_500.jsp");
-				return;
-			}//end catch
-		}//end if
 		
-		BoardService bs=new BoardService();
-		pageContext.setAttribute("bDTO", bs.searchBoardDetail(num));
-		//검색한 글의 카운트를 증가
-		
-		Object obj=session.getAttribute("cntNum");
-		Integer cntVal=(Integer)obj;
-		if(cntVal != null && cntVal.intValue() == num){
-			bs.modifyCount(num);
-		}
-		session.setAttribute("cntNum", num);
+		MultipartRequest mr=
+				new MultipartRequest(request,saveDir.getAbsolutePath(),
+						maxSize,"UTF-8",new DefaultFileRenamePolicy());
 		
 		%>
-		<form method="post" name="readForm" id="readForm">
-		<input type="hidden" name="num" value="${ bDTO.num }"/>
-		<input type="hidden" name="currentPage" value="${ param.currentPage }"/>
-		<table>
-		<tr>
-		<th colspan="2" style="text-align: center"><h3>아무말 대잔치 글읽기</h3></th>
-		</tr>
-		<tr>
-		<td width="120px">제목</td>
-		<td><input type="text" name="title" id="title" style="width: 600px" value="${ bDTO.title }"/></td>
-		</tr>
-		<tr>
-		<td>내용</td>
-		<td><textarea name="content" id="content"><c:out value="${ bDTO.content }" escapeXml="true"/></textarea></td>
-		</tr>
-		<tr>
-		<td>작성자</td>
-		<td><c:out value="${ bDTO.id }"/></td>
-		</tr>
-		<tr>
-		<td>ip</td>
-		<td><c:out value="${ bDTO.ip }"/></td>
-		</tr>
-		<tr>
-		<td>작성일</td>
-		<td><fmt:formatDate value="${ bDTO.input_date }" pattern="yyyy-MM-dd kk:mm:ss"/></td>
-		</tr>
-		<tr>
-		<td colspan="2" align="center">
-		<c:if test="${ userInfo.id == bDTO.id }">
-		<input type="button" value="글수정" class="btn btn-sm btn-primary" id="btnUpdate"/>
-		<input type="button" value="글삭제" class="btn btn-sm btn-warning" id="btnDelete"/>
-		</c:if>
-		
-		<c:set var="queryString" value="currentPage=${ param.currentPage }"/>
-		<c:if test="${ not empty param.keyword }">
-		<c:set var="queryString" value="${ queryString }&fieldNum=${param.fieldNum }&keyword=${param.keyword }"/>
-		</c:if>
-		<a href="javascript:location.href='boardList.jsp?${ queryString }'" class="btn btn-sm btn-info">리스트</a>
-		</td>
-		</tr>
-		</table>
-		</form>
-		
+		업로더 : <%= request.getParameter("uploader") %><br>
+		파일명 : <%= request.getParameter("upfile") %>
 		</div>
 		<!-- /.container -->
 		<!-- FOOTER -->

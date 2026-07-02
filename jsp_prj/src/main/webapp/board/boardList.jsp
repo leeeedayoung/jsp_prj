@@ -1,9 +1,10 @@
+<%@page import="kr.co.sist.util.BoardUtil"%>
 <%@page import="kr.co.sist.board.BoardDTO"%>
 <%@page import="java.util.List"%>
 <%@page import="kr.co.sist.board.BoardService"%>
 <%@ page language="java" contentType="text/html; charset=UTF-8"
    pageEncoding="UTF-8"%>
-<%@ include file="../include/siteProperty.jsp" %>
+<%@ include file="../include/siteProperty.jsp" %>   
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 
@@ -102,11 +103,34 @@
    display: block !important
 }
 
-.blue{color: #0000FF;}
-.red{color: #FF0000;}
+.blue{ color : #0000FF}
+.red{ color : #FF0000}
 
-a { color: #858585; text-decoration: none;}
+a { color:#858585; text-decoration: none}
 </style>
+<script type="text/javascript">
+$(function(){
+   $("#keyword").keyup(function(evt){
+      if(evt.which == 13){
+         chkNull();
+      }//ene if
+   });
+   
+   $("#btnSearch").click(chkNull);
+   
+   //fieldNum에 값이 있다면 select의 옵션을 선택한 상태로 만들 수 있다.
+   $("#fieldNum").val("${empty param.fieldNum?'0':param.fieldNum}");
+});//ready
+
+function chkNull(){
+   var keyword=$("#keyword").val();
+   if(keyword.trim()==""){
+      alert("검색어를 입력해 주세요.");
+      return;
+   }//end if
+   $("#searchFrm").submit();
+}
+</script>
 </head>
 <body>
    <svg xmlns="http://www.w3.org/2000/svg" class="d-none"> <symbol
@@ -168,41 +192,35 @@ a { color: #858585; text-decoration: none;}
    </div>
    <header data-bs-theme="dark">
       <nav class="navbar navbar-expand-md navbar-dark fixed-top bg-dark">
-         <c:import url="/fragments/navigationBar.jsp"/>
+      <c:import url="/fragments/navigationBar.jsp"/>
       </nav>
    </header>
    <main>
    <div id="boardDiv" style="margin-top: 20px">
    <jsp:useBean id="rDTO" class="kr.co.sist.board.RangeDTO" scope="page"/>
-   <jsp:setProperty name="rDTO" property="*"/>
+   <jsp:setProperty property="*" name="rDTO"/>
    <%
    BoardService bs=new BoardService();
-   //1. 총 레코드 수
-   int totalCount=0;
-   totalCount=bs.totalCount();
-   //2. 한 화면에 보여질 게시글의 수
-   int pageScale=10;
+   //1.총 레코드 수
+   int totalCount=bs.totalCount( rDTO ); 
+   //2.한 화면에 보여질 게시글의 수
+   int pageScale=bs.pageScale();
    //3. 총 페이지 수
-   int totalPage=(int)Math.ceil((double)totalCount/pageScale);
+   int totalPage= bs.totalPage(totalCount, pageScale);
    
-   //4. 시작번호 구하기
+   //4.선택한 페이지의 시작번호 구하기
    String tempPage=request.getParameter("currentPage");
-   int currentPage=1;
+   int currentPage=bs.currentPage(tempPage);
    
-   if(tempPage!=null){//pagination을 클릭했을 때 1,2,3,4 해당 페이지 번호가 입력
-	   currentPage=Integer.parseInt(tempPage);
-   }//end if
+   int startNum=bs.startNum(currentPage, pageScale);
    
-   int startNum=1;
-   startNum=currentPage*pageScale-pageScale+1;
-   
-   //5.선택한 페이지의 끝번호 구하기
-   int endNum=startNum+pageScale-1;
-   
-   rDTO.setStartNum(startNum);
-   rDTO.setEndNum(endNum);
-   
-   List<BoardDTO> listBoard=bs.searchBoard(rDTO);
+    //5.선택한 페이지의 끝번호 구하기    
+    int endNum=bs.endNum(startNum, pageScale);
+    
+    rDTO.setStartNum(startNum);
+    rDTO.setEndNum(endNum);
+    
+    List<BoardDTO> listBoard=bs.searchBoard(rDTO);
    
    pageContext.setAttribute("totalCount", totalCount);
    pageContext.setAttribute("pageScale", pageScale);
@@ -211,13 +229,15 @@ a { color: #858585; text-decoration: none;}
    pageContext.setAttribute("endNum", endNum);
    pageContext.setAttribute("currentPage", currentPage);
    pageContext.setAttribute("listBoard", listBoard);
+   
+   session.setAttribute("cntNum",0);
    %>
-   <%-- 총 레코드 수: ${totalCount }건<br>
-   한 화면에 보여질 게시글의 수: ${pageScale }건<br>
-   총 페이지 수: ${totalPage }장<br>
-   현재 페이지: ${currentPage }장<br>
-   시작 번호: ${startNum }<br>
-   끝 번호: ${endNum }<br> --%>
+<%--     총 레코드 수 : ${ totalCount }건<br>
+   한 화면에 보여질 게시글 수 : ${ pageScale }건<br>
+   총 페이지 수 : ${ totalPage }장<br>
+   현제 페이지 : ${currentPage }<br> 
+   시작번호 : ${ startNum }<br>
+   끝번호 : ${ endNum }<br>  --%>
    <div id="divBoardHeader">
    <c:if test="${ not empty userInfo }">
    <a href="boardWriteForm.jsp" class="btn btn-success btn-sm">글작성</a>
@@ -243,7 +263,12 @@ a { color: #858585; text-decoration: none;}
    <c:forEach var="bDTO" items="${listBoard }" varStatus="i">
    <tr>
    <td><c:out value="${ totalCount-(currentPage-1)*pageScale-i.index }"/></td>
-   <td><a href="boardDetail.jsp?num=${ bDTO.num }&currentPage=${currentPage}"><c:out value="${ bDTO.title }"/></a></td>
+   <td>
+   <c:set var="detailQuerystring" value="num=${ bDTO.num }&currentPage=${currentPage}"/>
+   <c:if test="${ not empty param.keyword }">
+   <c:set var="detailQuerystring" value="${ detailQuerystring }&fieldNum=${ param.fieldNum }&keyword=${param.keyword }"/>
+   </c:if>
+   <a href="boardDetail.jsp?${ detailQuerystring }"><c:out value="${ bDTO.title }"/></a></td>
    <td><c:out value="${ bDTO.id }"/></td>
    <td><fmt:formatDate value="${ bDTO.input_date }" pattern="yyyy-MM-dd kk:mm:ss"/></td>
    <td><c:out value="${ bDTO.cnt }"/></td>
@@ -253,21 +278,32 @@ a { color: #858585; text-decoration: none;}
    </tbody>
    </table>
    </div>
-   <div id="divSearchForm" style="height: 80px">
+   <div id="divSearchForm" style="height: 80px;text-align: center">
+   <form id="searchFrm" name="searchFrm" action="boardList.jsp">
+   <select name="fieldNum" id="fieldNum" style="height:30px ">
+   <option value="0">제목</option>
+   <option value="1">내용</option>
+   <option value="2">작성자</option>
+   </select>
+   <input type="text" name="keyword" id="keyword" value="${ param.keyword }">
+   <input type="text" style="display: none">
+   <input type="button" value="검색" id="btnSearch" class="btn btn-success btn-sm">   
+   </form>
+   </div>
+   <div id="divPagination">
+   
+   <%= BoardUtil.pagination(currentPage, totalPage, "boardList.jsp", 
+		   rDTO.getFieldNum(), rDTO.getKeyword()) %>
    
    </div>
-   <div id="divPagination" style="text-align: center">
-	   <c:forEach var="i" begin="1" end="${totalPage }" step="1">
-	   [<a href="boardList.jsp?currentPage=${i }">${i }</a>]
-	   </c:forEach>
-   </div>
    
    </div>
+   
       <!-- /.container -->
       <!-- FOOTER -->
-      	<footer class="container">
-      		<c:import url="${CommonURL}/fragments/footer.jsp"/>
-      	</footer>
+      <footer class="container">
+         <c:import url="${CommonURL}/fragments/footer.jsp"/>
+      </footer>
    </main>
    <script src="${CommonURL}/common/js/bootstrap.bundle.min.js"
       integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI"

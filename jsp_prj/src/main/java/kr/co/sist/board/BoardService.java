@@ -10,19 +10,85 @@ import kr.co.sist.chipher.DataDecryption;
 import kr.co.sist.user.member.MemberDTO;
 
 public class BoardService {
-	
-	public int totalCount() {
-		
+	private int totalCount;
+	private int pageScale;
+	/**
+	 * 게시글의 총 레코드
+	 * @return
+	 */
+	public int totalCount(RangeDTO rDTO) {
 		int cnt=0;
 		BoardDAO bDAO=BoardDAO.getInstance();
 		try {
-			cnt=bDAO.selectTotalCount();
+			cnt=bDAO.selectTotalCount(rDTO);
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}//end catch
+		totalCount=cnt;
 		return cnt;			
 	}//totalCount
 	
+	/**
+	 * 한 화면에 보여질 게시글의 수
+	 * @return
+	 */
+	public int pageScale() {
+		pageScale=10;
+		return pageScale;
+	}
+	
+	/**
+	 * 총 페이지 수
+	 * @param totalCount 총 게시글 수
+	 * @param pageScale 한 화면에 보여질 게시글의 수
+	 * @return
+	 */
+	public int totalPage(int totalCount, int pageScale) {
+		int totalPage=(int)Math.ceil( (double)totalCount/pageScale);
+		return totalPage;
+	}
+	
+	/**
+	 * 현재 페이지를 입력받아서 정수로 변환 후 반환.
+	 * @param tempPage
+	 * @return
+	 */
+	public int currentPage(String tempPage) {
+		int currentPage=1;
+		if( tempPage != null){ //pagination을 클릭했을 때 1,2,3,4  해당 페이지 번호가 입력
+			currentPage=Integer.parseInt(tempPage);
+		}//end if
+		return currentPage;
+	}//currentPage
+	
+	/**
+	 * 조회할 글의 시작번호
+	 * @param currentPage 현재페이지
+	 * @param pageScale 한 화면에 보여질 게시글의 수
+	 * @return
+	 */
+	public int startNum(int currentPage, int pageScale) {
+		int startNum= currentPage * pageScale-pageScale+1;
+		return startNum;
+	}//startNum
+	
+	/**
+	 * 조회할 글의 마지막번호
+	 * @param startNum 시작번호
+	 * @param pageScale 한 화면에 보여질 게시글의 수
+	 * @return
+	 */
+	public int endNum(int startNum, int pageScale) {
+		int endNum=startNum+pageScale-1;
+		return endNum;
+	}
+	
+	/**
+	 * 시작번호와 끝 번호, 검색 키워드, 검색 필드를 받아서 해당 시작번호오 끝번호 사이의
+	 * 글을 검색하는 일
+	 * @param rDTO 시작번호, 끝번호, 검색키워드, 검색필드
+	 * @return
+	 */
 	public List<BoardDTO> searchBoard(RangeDTO rDTO){
 		List<BoardDTO> listBoard=null;
 		BoardDAO bDAO=BoardDAO.getInstance();
