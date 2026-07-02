@@ -110,7 +110,8 @@ $(function(){
     });
 	
 	$("#resetPasswordBtn").click(function(){
-	    let clientId=$(this).data("id");
+		let pw = $("#newPassword").text();
+	    let clientId = $("#resetPasswordBtn").data("id");
 	    $.ajax({
 	        url:"resetPassword.jsp",
 	        type:"get",
