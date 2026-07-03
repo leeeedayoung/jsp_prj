@@ -2,7 +2,7 @@
 	pageEncoding="UTF-8"%>
 <%@ page import="java.util.*"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
-<%-- <%@ include file="../login/loginCheck.jsp" %> --%>
+<%@ include file="../login/loginCheck.jsp" %>
 <!DOCTYPE html>
 <html>
 <head>
@@ -94,6 +94,7 @@ $(function(){
         $.ajax({
             url:"clientDetail.jsp",
             type:"get",
+            dataType:"json",
             data:{
                 clientId:clientId
             },
@@ -115,6 +116,7 @@ $(function(){
 	    $.ajax({
 	        url:"resetPassword.jsp",
 	        type:"get",
+	        dataType:"json",
 	        data:{
 	            clientId:clientId
 	        },
@@ -127,6 +129,7 @@ $(function(){
 	
 	$("#resetConfirmBtn").click(function(){
 	    let pw=$("#newPassword").text();
+	    let clientId = $("#resetPasswordBtn").data("id");
 	    $.ajax({
 	        url:"sendEmail.jsp",
 	        type:"get",
@@ -150,47 +153,57 @@ $(function(){
 		<!-- 사이드바 -->
 		<c:import url="../fragments/sidebar.jsp"></c:import>
 
-		<jsp:useBean id="rDTO" class="kr.co.sist.client.RangeDTO" scope="page"/>
+		<jsp:useBean id="rDTO" class="kr.co.sist.manage.client.RangeDTO" scope="page"/>
 		<jsp:setProperty name="rDTO" property="*"/>
 		<%
-		ClientService cs=new ClientService();
+		ClientService cs = new ClientService();
 		
 		String keyword = request.getParameter("keyword");
-		if(keyword != null){
-		    rDTO.setKeyword(keyword);
+		if (keyword != null) {
+			rDTO.setKeyword(keyword.trim());
 		}
-		
-		String searchType = request.getParameter("searchType");
-		if(searchType == null){
-		    searchType = "all";
-		}
-		rDTO.setSearchType(searchType);
 		
 		String tempPage = request.getParameter("currentPage");
 		int currentPage = 1;
-		if(tempPage != null){
-		    currentPage = Integer.parseInt(tempPage);
+		
+		if (tempPage != null && !tempPage.trim().isEmpty()) {
+			try {
+				currentPage = Integer.parseInt(tempPage);
+			} catch (NumberFormatException nfe) {
+				currentPage = 1;
+			}
 		}
-		int totalCount = cs.totalCount(rDTO);
-		int pageScale = cs.pageScale(10);
-		int totalPage = cs.totalPage(totalCount,pageScale);
-		int startNum = cs.startNum(currentPage,pageScale);
-		int endNum = cs.endNum(currentPage,pageScale);
+		
+		int pageScale = 10;
+		int totalCnt = cs.getTotalCount();
+		int pageCnt = totalCnt / pageScale;
+		
+		if (totalCnt % pageScale != 0) {
+			pageCnt++;
+		}
+		
+		if (currentPage < 1) {
+			currentPage = 1;
+		}
+		
+		if (pageCnt > 0 && currentPage > pageCnt) {
+			currentPage = pageCnt;
+		}
+		
+		int startNum = (currentPage - 1) * pageScale + 1;
+		int endNum = currentPage * pageScale;
 		
 		rDTO.setStartNum(startNum);
 		rDTO.setEndNum(endNum);
+		rDTO.setTotalCnt(totalCnt);
+		rDTO.setPageCnt(pageCnt);
 		
-		List<ClientDTO> clientList = cs.getClientList();
+		List<ClientDTO> clientList = cs.getClientList(rDTO);
 		
-		pageContext.setAttribute("clientList",clientList);
-		pageContext.setAttribute("currentPage",currentPage);
-		pageContext.setAttribute("totalCount",totalCount);
-		pageContext.setAttribute("pageScale",pageScale);
-		pageContext.setAttribute("totalPage",totalPage);
-		pageContext.setAttribute("startNum",startNum);
-		pageContext.setAttribute("endNum",endNum);
-
-		pageContext.setAttribute("newCount",cs.getNewCount());
+		pageContext.setAttribute("clientList", clientList);
+		pageContext.setAttribute("currentPage", currentPage);
+		pageContext.setAttribute("rDTO", rDTO);
+		pageContext.setAttribute("newCount", cs.getNewCount());
 		%>
 
 		<!-- 메인 -->
@@ -212,7 +225,7 @@ $(function(){
 						<div class="summary-icon">👥</div>
 						<div>
 							<div class="summary-title">전체 사용자</div>
-							<div class="summary-count">${ totalCount }명</div>
+							<div class="summary-count">${ rDTO.totalCnt }명</div>
 						</div>
 					</div>
 
@@ -271,8 +284,8 @@ $(function(){
 							</tbody>
 						</table>
 						<div id="divPagination" style="text-align:center">
-						<c:forEach var="i" begin="1" end="${totalPage}">
-						[<a href="adminUsers.jsp?currentPage=${i}">${i}</a>]
+						<c:forEach var="i" begin="1" end="${rDTO.pageCnt}">
+						[<a href="adminUsers.jsp?currentPage=${i}&keyword=${param.keyword}">${i}</a>]
 						</c:forEach>
 						</div>
 					</div>

@@ -19,7 +19,7 @@ $(function(){
 			chkNull();
 		}//end if
 	});//keyup
-	$("#passwoard").keyup(function(evt){
+	$("#password").keyup(function(evt){
 		if(evt.which == 13){
 			chkNull();
 		}//end if

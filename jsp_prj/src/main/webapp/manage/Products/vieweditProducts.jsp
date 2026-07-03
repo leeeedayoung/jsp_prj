@@ -2,7 +2,7 @@
 	pageEncoding="UTF-8"%>
 <%@ page import="java.util.*"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
-<%-- <%@ include file="../login/loginCheck.jsp" %> --%>
+<%@ include file="../login/loginCheck.jsp" %>
 <!DOCTYPE html>
 <html>
 <head>

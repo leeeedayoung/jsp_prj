@@ -3,7 +3,7 @@
 <%@ page import="java.util.*"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
-<%-- <%@ include file="../login/loginCheck.jsp" %> --%>
+<%@ include file="../login/loginCheck.jsp" %>
 <!DOCTYPE html>
 <html>
 <head>
@@ -13,6 +13,20 @@
 <link href="http://localhost/jsp_prj/manage/css/bootstrap.min.css" rel="stylesheet">
 <link href="http://localhost/jsp_prj/manage/css/dashboard.css" rel="stylesheet">
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+
+<%
+DashBoardService dbs = new DashBoardService();
+
+request.setAttribute("totalSales", dbs.getTotalSales());
+request.setAttribute("newClientCount", dbs.getNewClientCount());
+request.setAttribute("nowItemCount", dbs.getNowItemCount());
+request.setAttribute("nonResponseCount", dbs.getNonResponseInquiryCount());
+
+request.setAttribute("newClientStatistics", dbs.getNewClientStatistics());
+request.setAttribute("dropOutClientStatistics", dbs.getDropOutClientStatistics());
+
+request.setAttribute("bestProductList", dbs.getBestProductList());
+%>
 
 <!-- 그래프에 사용할 배열 -->
 <script>
@@ -53,20 +67,6 @@ const dropOutData = [
 
 		<!-- 사이드바 -->
 		<c:import url="../fragments/sidebar.jsp"></c:import>
-		
-		<%-- <%
-		DashBoardService dbs = new DashBoardService();
-
-		request.setAttribute("totalSales", dbs.getTotalSales());
-		request.setAttribute("newClientCount", dbs.getNewClientCount());
-		request.setAttribute("nowItemCount", dbs.getNowItemCount());
-		request.setAttribute("nonResponseCount", dbs.getNonResponseInquiryCount());
-
-		request.setAttribute("newClientStatistics", dbs.getNewClientStatistics());
-		request.setAttribute("dropOutClientStatistics", dbs.getDropOutClientStatistics());
-
-		request.setAttribute("bestProductList", dbs.getBestProductList());
-		%> --%>
 		
 		<!-- 메인 -->
 		<div class="main">
@@ -115,23 +115,24 @@ const dropOutData = [
 			<div class="top5-card">
 				<h5>베스트 물품 Top5</h5>
 				<%
-				List<Map<String, Object>> bestProductList = (List<Map<String, Object>>)request.getAttribute("bestProductList");
+				Map<String, Integer> bestProductList = (Map<String, Integer>) request.getAttribute("bestProductList");
 				
 				if (bestProductList != null && !bestProductList.isEmpty()) {
-					for (int i = 0; i < bestProductList.size(); i++) {
-						Map<String, Object> product = bestProductList.get(i);
+				int rank = 1;
+				
+				for (Map.Entry<String, Integer> entry : bestProductList.entrySet()) {
 				%>
 				<div class="top-product">
-					<div>
-						<%= i + 1 %>.
-						<%= product.get("productName") %>
-					</div>
-					<div>
-						<strong> <%=product.get("orderCount")%>건 →</strong>
-					</div>
+				<div>
+				<%= rank %>. <%= entry.getKey() %>
+				</div>
+				<div>
+				<strong><%= entry.getValue() %>건 →</strong>
+				</div>
 				</div>
 				<%
-					}
+				rank++;
+				}
 				}
 				%>
 			</div>

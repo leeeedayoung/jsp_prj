@@ -3,11 +3,11 @@
 <%
 request.setCharacterEncoding("UTF-8");
 
-CategoryDTO cDTO = new CategoryDTO();
-cDTO.setCategoryName(request.getParameter("categoryName"));
+String categoryId = request.getParameter("categoryId");
+String categoryName = request.getParameter("categoryName");
 
 CategoryService cs = new CategoryService();
-cs.modifyCategory(cDTO);
+int result = cs.modifyCategory(categoryId, categoryName);
 
-out.print("success");
+out.print("카테고리 수정이 완료되었습니다.");
 %>

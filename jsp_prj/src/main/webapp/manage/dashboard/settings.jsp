@@ -2,7 +2,7 @@
 	pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ page import="java.util.*"%>
-<%-- <%@ include file="../login/loginCheck.jsp" %> --%>
+<%@ include file="../login/loginCheck.jsp" %>
 <%
 Boolean result = (Boolean)request.getAttribute("result");
 %>
@@ -34,31 +34,24 @@ function changePw() {
 	let newPw = document.getElementById("newPw").value;
 	let checkPw = document.getElementById("checkPw").value;
 
+	if (pw === "" || newPw === "" || checkPw === "") { 
+		pwMsg.innerHTML = "모든 비밀번호를 입력해주세요.";
+		return;
+	}
+	
 	if (newPw !== checkPw) {
 		document.getElementById("pwMsg").innerHTML = "새 비밀번호가 일치하지 않습니다.";
 		return;
 	}
 	document.getElementById("pwForm").submit();
 }
-</script>
-<%
-if (result != null) {
-	if (result) {
-		%>
-		<script>
-		document.getElementById("successModal").style.display = "flex";
-		</script>
-	<%
-	} else {
-		%>
-		<script>
-		document.getElementById("pwModal").style.display = "flex";
-    	document.getElementById("pwMsg").innerHTML = "현재 비밀번호가 일치하지 않습니다.";
-		</script>
-	<%
-	}
+
+function successConfirm() {
+	document.getElementById("successModal").style.display = "none";
 }
-%>
+
+</script>
+
 </head>
 <body>
 	<div class="wrapper">
@@ -66,12 +59,14 @@ if (result != null) {
 		<!-- 사이드바 -->
 		<c:import url="../fragments/sidebar.jsp"></c:import>
 		
-		<%-- <%
-		AdminService as=new AdminService();
-		List<AdminDTO> list=as.getAdminInfo(adminId);
+		<%
+		AdminService as = new AdminService();
 		
-		pageContext.setAttribute("adminInfoList", list);
-		%> --%>
+		String adminId = (String) session.getAttribute("adminId");
+		AdminDTO adminInfo = as.getAdminInfo(adminId);
+		
+		pageContext.setAttribute("adminInfo", adminInfo);
+		%>
 
 		<!-- 메인 -->
 		<div class="main">
@@ -88,7 +83,6 @@ if (result != null) {
 				<div class="personalInfo">
 					<h4>계정정보</h4>
 					<table class="info-table">
-						<c:forEach var="adminInfo" items="${ adminInfoList }">
 						<tr>
 							<th>이름</th>
 							<td><c:out value="${ adminInfo.adminName }"/></td>
@@ -105,7 +99,6 @@ if (result != null) {
 							<th>이메일</th>
 							<td><c:out value="${ adminInfo.adminEmail }"/></td>
 						</tr>
-						</c:forEach>
 					</table>
 					<button class="password-btn" onclick="openPwModal()">비밀번호 변경</button>
 				</div>
@@ -136,5 +129,23 @@ if (result != null) {
 			<button onclick="successConfirm()">확인</button>
 		</div>
 	</div>
+	<%
+	if (result != null) {
+		if (result) {
+			%>
+			<script>
+			document.getElementById("successModal").style.display = "flex";
+			</script>
+		<%
+		} else {
+			%>
+			<script>
+			document.getElementById("pwModal").style.display = "flex";
+	    	document.getElementById("pwMsg").innerHTML = "현재 비밀번호가 일치하지 않습니다.";
+			</script>
+		<%
+		}
+	}
+	%>
 </body>
 </html>
