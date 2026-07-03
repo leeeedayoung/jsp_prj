@@ -7,8 +7,8 @@
 <meta charset="utf-8">
 <title>관리자 로그인</title>
 <link rel="shortcut icon" href="http://localhost/jsp_prj/manage/images/favicon.png"/>
-<link href="http://localhost/jsp_prj/manage/css/bootstrap.min.css" rel="stylesheet">
-<link href="http://localhost/jsp_prj/manage/css/sign-in.css" rel="stylesheet">
+<link href="../css/bootstrap.min.css" rel="stylesheet">
+<link href="../css/sign-in.css" rel="stylesheet">
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
 
 <script>
@@ -83,6 +83,6 @@ function chkNull(){
 			<button class="btn w-100 py-2" style="background-color: #7CB342" id="btnSubmit">로그인</button>
 		</form>
 	</main>
-	<script src="http://localhost/jsp_prj/manage/js/bootstrap.bundle.min.js"></script>
+	<script src="../js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

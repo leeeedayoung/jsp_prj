@@ -3,6 +3,7 @@
 <%@ page import="java.util.*"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
+<%@page import="manage.dashboard.DashBoardService"%>
 <%@ include file="../login/loginCheck.jsp" %>
 <!DOCTYPE html>
 <html>
@@ -10,8 +11,8 @@
 <meta charset="UTF-8">
 <title>Dashboard</title>
 <link rel="shortcut icon" href="http://localhost/jsp_prj/manage/images/favicon.png"/>
-<link href="http://localhost/jsp_prj/manage/css/bootstrap.min.css" rel="stylesheet">
-<link href="http://localhost/jsp_prj/manage/css/dashboard.css" rel="stylesheet">
+<link href="../css/bootstrap.min.css" rel="stylesheet">
+<link href="../css/dashboard.css" rel="stylesheet">
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
 
 <%
@@ -140,6 +141,6 @@ const dropOutData = [
 	</div>
 
 	<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-	<script src="http://localhost/jsp_prj/manage/js/dashboard.js"></script>
+	<script src="../js/dashboard.js"></script>
 </body>
 </html>

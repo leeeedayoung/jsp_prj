@@ -2,16 +2,18 @@
 	pageEncoding="UTF-8"%>
 <%@ page import="java.util.*"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ page import="manage.client.ClientService" %>
+<%@ page import="manage.client.ClientDTO" %>
 <%@ include file="../login/loginCheck.jsp" %>
 <!DOCTYPE html>
 <html>
 <head>
 <meta charset="UTF-8">
 <title>Users</title>
-<link rel="shortcut icon" href="http://localhost/jsp_prj/manage/images/favicon.png"/>
-<link href="http://localhost/jsp_prj/manage/css/bootstrap.min.css" rel="stylesheet">
-<link href="http://localhost/jsp_prj/manage/css/dashboard.css" rel="stylesheet">
-<link href="http://localhost/jsp_prj/manage/css/user.css" rel="stylesheet">
+<link rel="shortcut icon" href="../images/favicon.png"/>
+<link href="../css/bootstrap.min.css" rel="stylesheet">
+<link href="../css/dashboard.css" rel="stylesheet">
+<link href="../css/user.css" rel="stylesheet">
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
 
 <script type="text/javascript">

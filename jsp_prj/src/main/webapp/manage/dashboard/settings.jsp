@@ -2,6 +2,8 @@
 	pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ page import="java.util.*"%>
+<%@ page import="manage.admin.AdminService" %>
+<%@ page import="manage.admin.AdminDTO" %>
 <%@ include file="../login/loginCheck.jsp" %>
 <%
 Boolean result = (Boolean)request.getAttribute("result");
@@ -12,9 +14,9 @@ Boolean result = (Boolean)request.getAttribute("result");
 <meta charset="UTF-8">
 <title>Settings</title>
 <link rel="shortcut icon" href="http://localhost/jsp_prj/manage/images/favicon.png"/>
-<link href="http://localhost/jsp_prj/manage/css/bootstrap.min.css" rel="stylesheet">
-<link href="http://localhost/jsp_prj/manage/css/dashboard.css" rel="stylesheet">
-<link href="http://localhost/jsp_prj/manage/css/settings.css" rel="stylesheet">
+<link href="../css/bootstrap.min.css" rel="stylesheet">
+<link href="../css/dashboard.css" rel="stylesheet">
+<link href="../css/settings.css" rel="stylesheet">
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
 
 <script>

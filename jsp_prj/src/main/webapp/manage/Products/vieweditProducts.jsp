@@ -2,6 +2,9 @@
 	pageEncoding="UTF-8"%>
 <%@ page import="java.util.*"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@page import="manage.searchproduct.SearchProductService"%>
+<%@page import="manage.searchproduct.ProductDTO"%>
+<%@page import="manage.searchproduct.RangeDTO"%>
 <%@ include file="../login/loginCheck.jsp" %>
 <!DOCTYPE html>
 <html>
@@ -15,27 +18,75 @@
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
 
 <script>
-function resetSearch(){
+function resetSearch() {
     document.getElementById("keyword").value = "";
     document.querySelector("input[name='status'][value='all']").checked = true;
-    document.getElementById("category").selectedIndex = 0;
+    document.getElementById("category").value = "";
     document.getElementById("startDate").value = "";
     document.getElementById("endDate").value = "";
-    
-    let dateBtns = document.querySelectorAll(".date-btns button");
-    dateBtns.forEach(function(btn){
+    document.getElementById("period").value = "all";
+    document.getElementById("pageSize").value = "20";
+    document.querySelectorAll(".date-btns button").forEach(function(btn) {
         btn.classList.remove("active");
     });
-    dateBtns[3].classList.add("active");
-} //resetSearch
+    document.querySelector(".date-btns button[data-period='all']").classList.add("active");
+}//resetSearch
 
-function selectPeriod(btn){
-    let dateBtns = document.querySelectorAll(".date-btns button");
-    dateBtns.forEach(function(item){
+function formatDate(date) {
+    let year = date.getFullYear();
+    let month = String(date.getMonth() + 1).padStart(2, "0");
+    let day = String(date.getDate()).padStart(2, "0");
+
+    return year + "-" + month + "-" + day;
+}//formatDate
+
+function selectPeriod(btn) {
+    let period = btn.dataset.period;
+    let today = new Date();
+    let startDate = new Date();
+    let endDate = new Date();
+
+    if (period === "today") {
+        startDate = new Date(today);
+    } else if (period === "week") {
+        startDate.setDate(today.getDate() - 6);
+    } else if (period === "month") {
+        startDate.setMonth(today.getMonth() - 1);
+    } else if (period === "3month") {
+        startDate.setMonth(today.getMonth() - 3);
+    } else if (period === "6month") {
+        startDate.setMonth(today.getMonth() - 6);
+    } else if (period === "year") {
+        startDate.setFullYear(today.getFullYear() - 1);
+    } else if (period === "all") {
+        document.getElementById("startDate").value = "";
+        document.getElementById("endDate").value = "";
+        document.getElementById("period").value = "all";
+        document.querySelectorAll(".date-btns button").forEach(function(item) {
+            item.classList.remove("active");
+        });
+        btn.classList.add("active");
+        return;
+    }
+
+    document.getElementById("startDate").value = formatDate(startDate);
+    document.getElementById("endDate").value = formatDate(endDate);
+    document.getElementById("period").value = period;
+    document.querySelectorAll(".date-btns button").forEach(function(item) {
         item.classList.remove("active");
     });
     btn.classList.add("active");
 }//selectPeriod
+
+function changePageSize() {
+    let form = document.getElementById("searchForm");
+    let pageInput = document.createElement("input");
+    pageInput.type = "hidden";
+    pageInput.name = "page";
+    pageInput.value = "1";
+    form.appendChild(pageInput);
+    form.submit();
+}//changePageSize
 
 function checkAllProducts(check){
     let products = document.querySelectorAll(".productCheck");
@@ -92,13 +143,53 @@ function closeEditModal(){
 		<c:import url="../fragments/sidebar.jsp"></c:import>
 
 		<%
+		request.setCharacterEncoding("UTF-8");
+		
 		SearchProductService sps = new SearchProductService();
-		List<ProductDTO> productList = sps.searchItem("");
-
+		
+		String keyword = request.getParameter("keyword");
+		String status = request.getParameter("status");
+		String category = request.getParameter("category");
+		String startDate = request.getParameter("startDate");
+		String endDate = request.getParameter("endDate");
+		
+		String pageParam = request.getParameter("page");
+		String pageSizeParam = request.getParameter("pageSize");
+		
+		int currentPage = 1;
+		int pageSize = 20;
+		
+		if (pageParam != null && !pageParam.isEmpty()) {
+			currentPage = Integer.parseInt(pageParam);
+		}
+		
+		if (pageSizeParam != null && !pageSizeParam.isEmpty()) {
+			pageSize = Integer.parseInt(pageSizeParam);
+		}
+		
+		RangeDTO rDTO = new RangeDTO();
+		
+		rDTO.setKeyword(keyword);
+		rDTO.setStatus(status);
+		rDTO.setCategory(category);
+		rDTO.setStartDate(startDate);
+		rDTO.setEndDate(endDate);
+		
+		int startNum = (currentPage - 1) * pageSize + 1;
+		int endNum = currentPage * pageSize;
+		
+		rDTO.setStartNum(startNum);
+		rDTO.setEndNum(endNum);
+		
+		List<ProductDTO> productList = sps.searchItem(rDTO);
+		
 		request.setAttribute("productList", productList);
-		request.setAttribute("totalCount", sps.countTotal());
-		request.setAttribute("onSaleCount", sps.countOnSale());
-		request.setAttribute("soldoutCount", sps.countSoldOut());
+		request.setAttribute("totalCount", sps.getTotalCount());
+		request.setAttribute("onSaleCount", sps.getOnSaleCount());
+		request.setAttribute("soldoutCount", sps.getSoldoutCount());
+		
+		request.setAttribute("currentPage", currentPage);
+		request.setAttribute("pageSize", pageSize);
 		%>
 
 		<!-- 메인 -->
@@ -134,66 +225,77 @@ function closeEditModal(){
 				</div>
 
 				<!-- 검색 -->
+				<form action="viewEditProducts.jsp" method="get" id="searchForm">
+				<input type="hidden" id="period" name="period" value="<%= request.getParameter("period") == null ? "3month" : request.getParameter("period") %>">
 				<div class="search-area">
 					<div class="search-row">
 						<div class="search-title">검색어</div>
 						<div class="search-content">
-							<input type="text" id="keyword" class="form-control"
-								placeholder="상품명을 입력하세요">
+						<input type="text" id="keyword" name="keyword" class="form-control" 
+								value="<%= keyword == null ? "" : keyword %>" placeholder="상품명을 입력하세요">
 						</div>
 					</div>
 					<div class="search-row">
 						<div class="search-title">판매상태</div>
 						<div class="search-content">
-							<label><input type="radio" name="status" value="all" checked> 전체</label>
-							<label><input type="radio" name="status" value="sale"> 판매중</label>
-							<label><input type="radio" name="status" value="soldout"> 품절</label>
+						<label>
+							<input type="radio" name="status" value="all" <%= status == null || "all".equals(status) ? "checked" : "" %>>
+							전체
+						</label>
+						<label>
+							<input type="radio" name="status" value="sale" <%= "sale".equals(status) ? "checked" : "" %>>
+							판매중
+						</label>
+						<label>
+							<input type="radio" name="status" value="soldout" <%= "soldout".equals(status) ? "checked" : "" %>>
+							품절
+						</label>
 						</div>
 					</div>
 					<div class="search-row">
 						<div class="search-title">카테고리</div>
 						<div class="search-content">
-							<select id="category" class="form-select">
-								<option>전체</option>
-								<option>과일</option>
-								<option>채소</option>
+							<select id="category" name="category" class="form-select">
+								<option value="">전체</option>
+								<option value="과일" <%= "과일".equals(category) ? "selected" : "" %>>과일</option>
+								<option value="채소" <%= "채소".equals(category) ? "selected" : "" %>>채소</option>
 							</select>
 						</div>
 					</div>
-
 					<div class="search-row">
 						<div class="search-title">기간</div>
 						<div class="search-content">
 							<div class="date-btns">
-								<button type="button" onclick="selectPeriod(this)">오늘</button>
-								<button type="button" onclick="selectPeriod(this)">1주일</button>
-								<button type="button" onclick="selectPeriod(this)">1개월</button>
-								<button type="button" class="active" onclick="selectPeriod(this)">3개월</button>
-								<button type="button" onclick="selectPeriod(this)">6개월</button>
-								<button type="button" onclick="selectPeriod(this)">1년</button>
-								<button type="button" onclick="selectPeriod(this)">전체</button>
+								<button type="button" data-period="today" onclick="selectPeriod(this)">오늘</button>
+								<button type="button" data-period="week" onclick="selectPeriod(this)">1주일</button>
+								<button type="button" data-period="month" onclick="selectPeriod(this)">1개월</button>
+								<button type="button" data-period="3month" onclick="selectPeriod(this)">3개월</button>
+								<button type="button" data-period="6month" onclick="selectPeriod(this)">6개월</button>
+								<button type="button" data-period="year" onclick="selectPeriod(this)">1년</button>
+								<button type="button" data-period="all" onclick="selectPeriod(this)">전체</button>
 							</div>
 							<div class="date-input">
-								<input type="date" id="startDate"> ~ <input type="date" id="endDate">
+								<input type="date" id="startDate" name="startDate" value="<%= startDate == null ? "" : startDate %>">~
+								<input type="date" id="endDate" name="endDate" value="<%= endDate == null ? "" : endDate %>">
 							</div>
 						</div>
 					</div>
-
 					<div class="search-button">
 						<button type="button" class="btn-reset" onclick="resetSearch()">초기화</button>
-						<button type="button" class="btn-search">조회</button>
+						<button type="submit" class="btn-search">조회</button>
 					</div>
 				</div>
-
+				
 				<!-- 목록 -->
 				<div class="list-top">
-					<span>상품목록 <b>5644</b>개
-					</span> <select id="pageSize">
-						<option value="20">20개씩</option>
-						<option value="50">50개씩</option>
-						<option value="100">100개씩</option>
+					<span>상품목록 <b>${ totalCount }</b>개</span> 
+					<select id="pageSize" name="pageSize" onchange="changePageSize()">
+						<option value="20" <%= pageSize == 20 ? "selected" : "" %>>20개씩</option>
+						<option value="50" <%= pageSize == 50 ? "selected" : "" %>>50개씩</option>
+						<option value="100" <%= pageSize == 100 ? "selected" : "" %>>100개씩</option>
 					</select>
 				</div>
+				</form>
 
 				<table class="table table-bordered table-hover align-middle text-center">
 					<thead>
@@ -230,14 +332,10 @@ function closeEditModal(){
 					</tbody>
 				</table>
 
-				<div class="pagination-wrap">
-					<button>&lt;</button>
-					<button class="active">1</button>
-					<button>2</button>
-					<button>3</button>
-					<button>4</button>
-					<button>5</button>
-					<button>&gt;</button>
+				<div id="divPagination-wrap" style="text-align:center">
+				<c:forEach var="i" begin="1" end="${rDTO.pageCnt}">
+				[<a href="adminUsers.jsp?currentPage=${i}&keyword=${param.keyword}">${i}</a>]
+				</c:forEach>
 				</div>
 
 				<form id="deleteForm" method="post" action="deleteProduct.jsp"></form>

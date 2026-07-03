@@ -2,13 +2,15 @@
 	pageEncoding="UTF-8"%>
 <%@ page import="java.util.*"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
-<%-- <%@ include file="../login/loginCheck.jsp" %> --%>
+<%@ page import="manage.addproduct.AddProductService" %>
+<%@ page import="manage.addproduct.ImageDTO" %>
+<%@ include file="../login/loginCheck.jsp" %>
 <!DOCTYPE html>
 <html>
 <head>
 <meta charset="UTF-8">
 <title>Add Product</title>
-<link rel="shortcut icon" href="http://localhost/jsp_prj/manage/images/favicon.png"/>
+<link rel="shortcut icon" href="../images/favicon.png"/>
 <link href="../css/bootstrap.min.css" rel="stylesheet">
 <link href="../css/dashboard.css" rel="stylesheet">
 <link href="../css/addProduct.css" rel="stylesheet">
@@ -18,16 +20,6 @@
 let selectedInput = "";
 let selectedPreview = "";
 let selectedCard = null;
-const imageList = [
-	{name:"사과", url:"https://picsum.photos/id/102/300/300"},
-	{name:"배", url:"https://picsum.photos/id/103/300/300"},
-	{name:"토마토", url:"https://picsum.photos/id/104/300/300"},
-	{name:"포도", url:"https://picsum.photos/id/105/300/300"},
-	{name:"감자", url:"https://picsum.photos/id/106/300/300"},
-	{name:"당근", url:"https://picsum.photos/id/107/300/300"},
-	{name:"양파", url:"https://picsum.photos/id/108/300/300"},
-	{name:"상추", url:"https://picsum.photos/id/109/300/300"}
-];
 
 $(function(){
     $(".accordion-header").click(function(){
@@ -50,8 +42,6 @@ $(function(){
     $("#productDesc").on("input",function(){
         $("#descCount").text($(this).val().length);
     });
-
-    makeImageCards();
 
     $(".image-btn").click(function(){
         selectedInput=$(this).data("target");
@@ -84,20 +74,6 @@ $(function(){
         $("#imageModal").hide();
     });
 });
-
-function makeImageCards(){
-    let html="";
-
-    for(let i=0;i<imageList.length;i++){
-        html+=`
-        <div class="image-card" data-url="${imageList[i].url}">
-            <img src="${imageList[i].url}">
-            <div class="image-name">${imageList[i].name}</div>
-        </div>
-        `;
-    }
-    $(".image-list").html(html);
-}//makeImageCards
 
 </script>
 
@@ -222,47 +198,52 @@ function makeImageCards(){
 									<tr>
 										<th width="60">NO</th>
 										<th width="130">용도</th>
-										<th>이미지 URL</th>
+										<th>선택한 파일</th>
 										<th width="110"></th>
-										<th width="120">미리보기</th>
 									</tr>
 									<tr>
 										<td>1</td>
 										<td>썸네일</td>
-										<td><input type="text" id="thumbImg" name="img" readonly></td>
+										<td>
+											<input type="text" id="thumbFileName" readonly placeholder="선택된 파일이 없습니다.">
+											<input type="file" id="thumbImg" name="thumbImg" accept="image/*">
+										</td>
 										<td>
 											<button type="button" class="image-btn" data-target="thumbImg" data-preview="thumbPreview">등록하기</button>
 										</td>
-										<td><img id="thumbPreview" class="preview-img" src=""></td>
 									</tr>
-
 									<tr>
 										<td>2</td>
 										<td>대표이미지</td>
-										<td><input type="text" id="mainImg" name="img" readonly></td>
+										<td>
+											<input type="text" id="mainFileName" readonly placeholder="선택된 파일이 없습니다.">
+											<input type="file" id="mainImg" name="mainImg" accept="image/*" hidden>
+										</td>
 										<td>
 											<button type="button" class="image-btn" data-target="mainImg" data-preview="mainPreview">등록하기</button>
 										</td>
-										<td><img id="mainPreview" class="preview-img" src=""></td>
 									</tr>
-
 									<tr>
 										<td>3</td>
 										<td>상품설명</td>
-										<td><input type="text" id="descImg" name="img" readonly></td>
+										<td>
+											<input type="text" id="descFileName" readonly placeholder="선택된 파일이 없습니다.">
+											<input type="file" id="descImg" name="descImg" accept="image/*" hidden>
+										</td>
 										<td>
 											<button type="button" class="image-btn" data-target="descImg" data-preview="descPreview">등록하기</button>
 										</td>
-										<td><img id="descPreview" class="preview-img" src=""></td>
 									</tr>
 									<tr>
 										<td>4</td>
 										<td>상세정보</td>
-										<td><input type="text" id="detailImg" name="img" readonly></td>
+										<td>
+											<input type="text" id="detailFileName" readonly placeholder="선택된 파일이 없습니다.">
+											<input type="file" id="detailImg" name="detailImg" accept="image/*" hidden>
+										</td>
 										<td>
 											<button type="button" class="image-btn" data-target="detailImg" data-preview="detailPreview">등록하기</button>
 										</td>
-										<td><img id="detailPreview" class="preview-img" src=""></td>
 									</tr>
 								</table>
 
@@ -280,14 +261,14 @@ function makeImageCards(){
 								<div class="form-row">
 									<label>미성년자 구매</label>
 									<div class="radio-group">
-										<label><input type="radio" name="underagePurchase" value="0" checked> 가능</label> 
-										<label><input type="radio" name="underagePurchase" value="1"> 불가능</label>
+										<label><input type="radio" name="underAgePurchase" value="0" checked> 가능</label> 
+										<label><input type="radio" name="underAgePurchase" value="1"> 불가능</label>
 									</div>
 								</div>
 
 								<!-- 무게 -->
 								<div class="form-row">
-									<label>무게(g)</label> <input type="number" name="weight">
+									<label>무게(g)</label> <input type="number" name="weight" min="1">
 								</div>
 
 								<!-- 유통기한 -->
