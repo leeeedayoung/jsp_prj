@@ -1,3 +1,4 @@
+<%@page import="java.net.URLEncoder"%>
 <%@page import="kr.co.sist.util.BoardUtil"%>
 <%@page import="kr.co.sist.board.BoardDTO"%>
 <%@page import="java.util.List"%>
@@ -251,13 +252,14 @@ function chkNull(){
    <th style="width: 400px">제목</th>
    <th style="width: 130px">작성자</th>
    <th style="width: 150px">작성일</th>
+   <th style="width: 80px">첨부파일</th>
    <th style="width: 80px">조회수</th>
    </tr>
    </thead>
    <tbody>
    <c:if test="${ empty listBoard }">
    <tr>
-   <td colspan="5" style="text-align: center">게시글이 없습니다.</td>
+   <td colspan="6" style="text-align: center">게시글이 없습니다.</td>
    </tr>
    </c:if>
    <c:forEach var="bDTO" items="${listBoard }" varStatus="i">
@@ -271,6 +273,11 @@ function chkNull(){
    <a href="boardDetail.jsp?${ detailQuerystring }"><c:out value="${ bDTO.title }"/></a></td>
    <td><c:out value="${ bDTO.id }"/></td>
    <td><fmt:formatDate value="${ bDTO.input_date }" pattern="yyyy-MM-dd kk:mm:ss"/></td>
+   <td>
+   	<c:if test="${ not empty bDTO.upfile }">
+   	<a href="${commonURL}/board/download.jsp?file=${bDTO.upfile}"><img src="images/img.png" style="width: 27px"></a>
+   	</c:if>
+   </td>
    <td><c:out value="${ bDTO.cnt }"/></td>
    </tr>
    </c:forEach>
@@ -296,7 +303,16 @@ function chkNull(){
 		   rDTO.getFieldNum(), rDTO.getKeyword()) %>
    
    </div>
-   
+   <div>
+   <a href="${CommonURL }/board/download.jsp?file=34824632.txt">txt</a><br>
+   <a href="${CommonURL }/board/download.jsp?file=exam0520.html">http</a><br>
+   <a href="${CommonURL }/board/download.jsp?file=20260707_JSP">pptx</a><br>
+   </div>
+   <%
+   String fileName="토끼.png";
+   String encode=URLEncoder.encode(fileName, "UTF-8");
+   %>
+   <a href="${CommonURL }/board/download.jsp?file=토끼.png">이미지</a><br>
    </div>
    
       <!-- /.container -->

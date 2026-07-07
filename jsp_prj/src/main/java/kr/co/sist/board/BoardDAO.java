@@ -82,8 +82,8 @@ public class BoardDAO {
 			//쿼리문 수행 객체 얻기
 			StringBuilder selectBoard=new StringBuilder();
 			selectBoard
-			.append("	select num, id, title, input_date,cnt						")
-			.append("	from (select NUM, ID, TITLE, INPUT_DATE, CNT,				")
+			.append("	select num, id, title, input_date,cnt,upfile				")
+			.append("	from (select NUM, ID, TITLE, INPUT_DATE, CNT,upfile,		")
 			.append("			row_number() over( order by input_date desc) rnum	")
 			.append("			from board											");
 			
@@ -95,8 +95,6 @@ public class BoardDAO {
 			selectBoard.append("	) where rnum between ? and ?					");
 			pstmt=con.prepareStatement(selectBoard.toString());
 			//바인드 변수에 값 설정
-			
-			//System.out.println(selectBoard);
 			
 			int bindInd=0;
 			if(rDTO.getKeyword() != null && !rDTO.getKeyword().isEmpty()) {
@@ -116,6 +114,7 @@ public class BoardDAO {
 				bDTO.setTitle(rs.getString("title"));
 				bDTO.setInput_date(rs.getDate("input_date"));
 				bDTO.setCnt(rs.getInt("cnt"));
+				bDTO.setUpfile(rs.getString("upfile"));
 				
 				boardList.add(bDTO);
 			}//end if
@@ -227,11 +226,22 @@ public class BoardDAO {
 		try {
 			//커넥션얻기
 			con=gc.getConn("dbcp");
+			
+			boolean flag=bDTO.getUpfile() != null;
 			//쿼리문 수행 객체 얻기
 			StringBuilder insertBoard=new StringBuilder();
 			insertBoard
-			.append("	insert into board(num, id, title, content, ip)	")
-			.append("	values(seq_board.nextval,?,?,?,?)				");
+			.append("	insert into board(num, id, title, content, ip");
+			if(flag) {
+				insertBoard.append(",upfile");
+			}//end if
+			insertBoard.append(")	")
+			.append("	values(seq_board.nextval,?,?,?,?");
+			if(flag) {
+				insertBoard.append(",?");
+			}//end if
+			
+			insertBoard.append(")	");
 			
 			pstmt=con.prepareStatement(insertBoard.toString());
 			//바인드 변수에 값 설정
@@ -241,6 +251,9 @@ public class BoardDAO {
 			pstmt.setString(3, bDTO.getContent());
 			pstmt.setString(4, bDTO.getIp());
 			
+			if(flag) {
+				pstmt.setString(5, bDTO.getUpfile());
+			}//end if
 			//쿼리문 실행 후 결과 얻기
 			pstmt.executeUpdate();
 			
