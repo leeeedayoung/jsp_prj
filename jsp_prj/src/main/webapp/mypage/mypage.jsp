@@ -107,40 +107,88 @@
 <script type="text/javascript">
 $(function(){
 	//이미지 선택 버튼이 클릭
-	$("#btnPorfile").click(function(){
+	$("#btnProfile").click(function(){
 		//버튼을 클릭했을 때 input type="file"을 클릭한 이벤트를 발생
-		$("#profile").click();
+		$("#upProfile").click();
 	});//click
+	
+	//File을 선택하면 $("#upProfile")의 값이 변경된다.=> change event 발생
+	$("#upProfile").change(uploadProfile);
 	
 	$("#btnSearch").click(function(){
 		
-		var param={ id:"${userInfo.id}"}
+		var param={ id : "${userInfo.id}"}
 		
 		$.ajax({
 			url:"searchMyPage.jsp",
 			type:"post",
-			data:param,
-			dataType:"json",
+			data: param,
+			dataType:"JSON",
 			error:function( xhr ){
-				console.log( xhr.status+" / "+ xhr.statusText )
+				console.log( xhr.status+ " / "+ xhr.statusText)
 			},
 			success:function( jsonObj ){
-				//
+				//"zipcode":"12345","address":"서울시 강남구 ","phone":"010-1234-5678","address2":"대치1동","profile":"default_profile.png","ip":"192.168.10.68","name":"테스트","input_date":"2026-06-30 화 오후 12:24:03","email":"test@test.com"}
 				$("#profile")[0].src
-					="${ CommonURL }${ uploadDir }/profile/"+jsonObj.profile;
-				$("#name").val(jsonObj.name);
-				$("#email").val(jsonObj.email);
-				$("#phone").val(jsonObj.phone);
-				$("#zipcode").val(jsonObj.zipcode);
-				$("#address").val(jsonObj.address);
-				$("#address2").val(jsonObj.address2);
-				$("#ip").html(jsonObj.ip);
-				$("#input_date").html(jsonObj.input_date);
+					="${ CommonURL }${ upoloadDir }/profile/"+jsonObj.profile;
+				$("#profile").val( jsonObj.profile );
+				$("#name").val( jsonObj.name );
+				$("#email").val( jsonObj.email );
+				$("#phone").val( jsonObj.phone );
+				$("#zipcode").val( jsonObj.zipcode );
+				$("#address").val( jsonObj.address );
+				$("#address2").val( jsonObj.address2 );
+				$("#ip").html( jsonObj.ip );
+				$("#input_date").html( jsonObj.input_date );
 			}
 			
 		});
 	});//click
 });//ready
+
+function uploadProfile(){
+	var fileName=$("#upProfile").val();
+	var ext=fileName.substring(fileName.lastIndexOf(".")+1).toLowerCase();
+	
+	//선택한 파일의 확장자를 체크( 이미지만 가능-jpg,jpeg,gif, png,bmp)
+	var allowedExt="jpg,jpeg,gif,png,bmp".split(",");
+	
+	var allowedFlag;
+	for( var i=0 ; i < allowedExt.length ; i++){
+		if(allowedFlag=(ext == allowedExt[i])){
+			break;
+		}//end if
+	}//end for
+	
+	if(!allowedFlag){
+		alert("프로필은 이미지만 선택해 주세요");
+		return;
+	}//end if
+	
+	//1.form을 얻어서 FormData객체에 할당 (parameter전송방식 => binary전송방식)
+	var formData =new FormData($("#mypageForm")[0] );
+	$.ajax({
+	 url:"${ CommonURL }/mypage/imgUpload.jsp",
+	 type:"post",
+	 contentType:false, //parameter전송방식 => binary전송방식
+	 processData:false, //query string을 붙이지 않도록 설정
+	 data : formData,
+	 dataType:"JSON",
+	 error: function( xhr ){
+		 alert( xhr.status )
+	 },
+	 success: function( jsonObj){
+		 if( jsonObj.result ){
+			$("#profile")[0].src="${ CommonURL }/upload/profile/"+jsonObj.imgName;
+		 }else{
+			alert("프로필 이미지가 정상적으로 업로드되지 않았습니다.");
+			
+		 }//end else
+	 }
+		
+	});//ajax
+	
+}//uploadProfile
 </script>
 </head>
 <body>
@@ -214,11 +262,11 @@ $(function(){
 		<table style="margin: 0px auto">
 		<tr>
 		<td style="vertical-align: top;width: 300px ">
-		<img src="${ CommonURL }${ uploadDir }/profile/default_profile.png"
-		 style="border-radius: 150px; width: 150px; height: 150px" id="profile"/><br>
-		 <input type="file" name="profile" id="profile" style="display: none;"/>
+		<img src="${ CommonURL }${ upoloadDir }/profile/default_profile.png"
+		 style="border-radius: 150px; width: 150px;height: 150px" id="profile"/><br>
+		 <input type="file" name="upProfile" id="upProfile" style="display: none;"/>
 		 <input type="button" value="이미지업로드" class="btn btn-success btn-sm"
-		  id="btnPorfile"/>
+		  id="btnProfile"/>
 		</td>
 		<td>
 		<h3>마이페이지- 정보수정</h3>
@@ -226,36 +274,36 @@ $(function(){
 		<tr>
 		<td>아이디</td>
 		<td><strong><c:out value="${ userInfo.id }"/></strong>
-			<input type="button" value="조회" class="btn btn-warning btn-sm"
+			<input type="button" value="조회" class="btn btn-warning btn-sm" 
 			id="btnSearch"/></td>
 		</tr>
 		<tr>
 		<td>이름</td>
-		<td><input type="text" id="name" name="name" value="" readonly="readonly"></td>
+		<td><input type="text" name="name" id="name" value="" readonly="readonly"></td>
 		</tr>
 		<tr>
 		<td>이메일</td>
-		<td><input type="text" id="email" name="email" value=""></td>
+		<td><input type="text" name="email" id="email" value=""></td>
 		</tr>
 		<tr>
 		<td>전화번호</td>
-		<td><input type="text" id="phone" name="phone" value=""></td>
+		<td><input type="text" name="phone" id="phone" value=""></td>
 		</tr>
 		<tr>
 		<td>우편번호</td>
-		<td><input type="text" id="zipcode" name="zipcode" value="" style="width: 70px"
+		<td><input type="text" name="zipcode" id="zipcode" value="" style="width: 70px"
 				readonly="readonly"> 
 				<input type="button" value="검색" class="btn btn-success btn-sm"/></td>
 		</tr>
 		<tr>
 		<td>주소</td>
-		<td><input type="text" id="address" name="address" value="" style="width: 300px"
+		<td><input type="text" name="address"  id="address" value="" style="width: 300px"
 				readonly="readonly"> 
 		</td>
 		</tr>
 		<tr>
 		<td>상세주소</td>
-		<td><input type="text" id="address2" name="address2" value="" style="width: 300px"/></td>
+		<td><input type="text" name="address2"  id="address2" value="" style="width: 300px"/></td>
 		</tr>
 		<tr>
 		<td>가입 ip주소</td>

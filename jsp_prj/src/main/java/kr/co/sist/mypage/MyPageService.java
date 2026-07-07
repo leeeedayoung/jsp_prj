@@ -10,9 +10,9 @@ import kr.co.sist.user.member.MemberDTO;
 
 public class MyPageService {
 	public String searchMyPage(String id) {
-		MemberDTO mDTO=null;
 		
 		JSONObject jsonObj = new JSONObject();
+		MemberDTO mDTO=null;
 		
 		MyPageDAO mpDAO=MyPageDAO.getInstance();
 		try {
@@ -44,4 +44,18 @@ public class MyPageService {
 		}//end catch
 		return jsonObj.toJSONString();
 	}//searchLogin
+	
+	public boolean modifyProfile(String id, String profile) {
+		boolean flag=false;
+		
+		MyPageDAO lDAO=MyPageDAO.getInstance();
+		
+		try {
+			flag=lDAO.updateUserProfile(id, profile)==1;
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}//end catch
+		
+		return flag;
+	}
 }//class
