@@ -2,7 +2,9 @@
 	pageEncoding="UTF-8"%>
 <%@ page import="java.util.*"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
-<%-- <%@ include file="../login/loginCheck.jsp" %> --%>
+<%@page import="manage.category.CategoryService"%>
+<%@page import="manage.category.CategoryDTO"%>
+<%@ include file="../login/loginCheck.jsp" %>
 <!DOCTYPE html>
 <html>
 <head>
@@ -88,6 +90,36 @@ $(function() {
 	        }
 	    });
 	});
+	
+	// 삭제
+	$("#deleteCategoryBtn").click(function() {
+		let categoryId = $("#editCategoryNo").val();
+		let categoryName = $("#editCategoryName").val();
+	
+		if (!confirm("'" + categoryName + "' 카테고리를 삭제하시겠습니까?")) {
+			return;
+		}
+
+		$.ajax({
+			url: "removeCategory.jsp",
+			type: "POST",
+			data: {
+				categoryId: categoryId
+			},
+			success: function(result) {
+				if ($.trim(result) === "1") {
+					alert("카테고리가 삭제되었습니다.");
+					location.reload();
+				} else {
+					alert("카테고리 삭제에 실패했습니다.");
+				}
+			},
+			error: function() {
+				alert("삭제 중 오류가 발생했습니다.");
+			}
+		});
+	});
+
 });
 </script>
 
@@ -99,11 +131,11 @@ $(function() {
 		<!-- 사이드바 -->
 		<c:import url="../fragments/sidebar.jsp"></c:import>
 
-		<%-- <%
+		<%
 		CategoryService cs = new CategoryService();
 		List<CategoryDTO> categoryList=cs.showCategory();
 		pageContext.setAttribute("categoryList", categoryList);
-		%> --%>
+		%>
 
 		<!-- 메인 -->
 		<div class="main">
@@ -124,7 +156,7 @@ $(function() {
 								<span>&gt;</span>
 								<div class="category-info">
 									<span class="category-name">${category.categoryName}</span>
-									<button class="edit-btn" data-no="${category.categoryId}"
+									<button class="edit-btn" data-no="${category.categoryID}"
 										data-name="${category.categoryName}">✎</button>
 								</div>
 							</div>
@@ -151,6 +183,7 @@ $(function() {
 				<input type="text" id="editCategoryName" name="categoryName">
 			</div>
 			<div class="modal-footer">
+				<button type="button" class="delete-btn" id="deleteCategoryBtn">삭제</button>
 				<button type="button" class="cancel-btn" id="editCancelBtn">취소</button>
 				<button type="button" class="save-btn" id="editSaveBtn">저장</button>
 			</div>

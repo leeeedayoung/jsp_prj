@@ -1,25 +1,137 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
 	pageEncoding="UTF-8"%>
 <%@ page import="java.util.*"%>
+<%@ page import="manage.ordermanagement.RangeDTO" %>
+<%@ page import="manage.ordermanagement.OrderDTO" %>
+<%@ page import="manage.ordermanagement.OrderManagementService" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
-<%-- <%@ include file="../login/loginCheck.jsp" %> --%>
+<%@ include file="../login/loginCheck.jsp" %>
 <!DOCTYPE html>
 <html>
 <head>
 <meta charset="UTF-8">
 <title>Order</title>
-<link rel="shortcut icon" href="http://localhost/jsp_prj/manage/images/favicon.png"/>
-<link href="http://localhost/jsp_prj/manage/css/bootstrap.min.css" rel="stylesheet">
-<link href="http://localhost/jsp_prj/manage/css/dashboard.css" rel="stylesheet">
-<link href="http://localhost/jsp_prj/manage/css/order.css" rel="stylesheet">
+<link rel="shortcut icon" href="../images/favicon.png"/>
+<link href="../css/bootstrap.min.css" rel="stylesheet">
+<link href="../css/dashboard.css" rel="stylesheet">
+<link href="../css/order.css" rel="stylesheet">
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
 
 <script type="text/javascript">
 $(function(){
-	
+    const searchBtn = document.getElementById("searchBtn");
+    const resetBtn = document.getElementById("resetBtn");
+    const allCheck = document.getElementById("allCheck");
+    const dateBtns = document.querySelectorAll(".date-btn");
+
+    // 날짜를 yyyy-MM-dd 형식으로 변환
+    function formatDate(date) {
+        const year = date.getFullYear();
+        const month = String(date.getMonth() + 1).padStart(2, "0");
+        const day = String(date.getDate()).padStart(2, "0");
+        return year + "-" + month + "-" + day;
+    }
+
+    // 초기화 버튼
+    resetBtn.addEventListener("click", function(){
+        dateBtns.forEach(function(btn){
+            btn.classList.remove("active");
+        });
+        // 기본값: 1개월
+        dateBtns[2].classList.add("active");
+        document.getElementById("startDate").value = "";
+        document.getElementById("endDate").value = "";
+        document.getElementById("orderStatus").value = "";
+        document.getElementById("category").value = "";
+
+        // 전체 체크도 해제
+        allCheck.checked = false;
+        document.querySelectorAll(
+            "#orderTableBody input[type=checkbox]"
+        ).forEach(function(check){
+            check.checked = false;
+        });
+    });
+
+    // 전체 체크
+    allCheck.addEventListener("change", function(){
+        const checks = document.querySelectorAll(
+            "#orderTableBody input[type=checkbox]"
+        );
+        checks.forEach(function(check){
+            check.checked = allCheck.checked;
+        });
+    });
+
+    // 개별 체크박스 상태에 따라 전체 체크박스 변경
+    document.querySelectorAll(
+        "#orderTableBody input[type=checkbox]"
+    ).forEach(function(check){
+        check.addEventListener("change", function(){
+            const checks = document.querySelectorAll(
+                "#orderTableBody input[type=checkbox]"
+            );
+            const checkedCount = document.querySelectorAll(
+                "#orderTableBody input[type=checkbox]:checked"
+            ).length;
+            allCheck.checked = checks.length === checkedCount;
+        });
+    });
+
+    // 오늘 / 1주일 / 1개월 / 3개월 버튼
+    dateBtns.forEach(function(btn){
+        btn.addEventListener("click", function(){
+            dateBtns.forEach(function(dateBtn){
+                dateBtn.classList.remove("active");
+            });
+            this.classList.add("active");
+            const endDate = new Date();
+            const startDate = new Date();
+            const text = this.textContent.trim();
+            if(text === "오늘"){
+                // 시작일과 종료일 모두 오늘
+            } else if(text === "1주일"){
+                startDate.setDate(endDate.getDate() - 7);
+            } else if(text === "1개월"){
+                startDate.setMonth(endDate.getMonth() - 1);
+            } else if(text === "3개월"){
+                startDate.setMonth(endDate.getMonth() - 3);
+            }
+            document.getElementById("startDate").value = formatDate(startDate);
+            document.getElementById("endDate").value = formatDate(endDate);
+        });
+    });
+
+    // 취소 요청 모달
+    document.querySelectorAll(".cancel-btn").forEach(function(btn){
+        btn.addEventListener("click", function(){
+            const orderNo = this.dataset.orderNo;
+            console.log("취소 요청 주문번호:", orderNo);
+            const modal = new bootstrap.Modal(
+                document.getElementById("cancelModal")
+            );
+            modal.show();
+        });
+    });
+
+    // 교환 요청 모달
+    document.querySelectorAll(".claim-btn").forEach(function(btn){
+        btn.addEventListener("click", function(){
+            const modal = new bootstrap.Modal(
+                document.getElementById("exchangeModal")
+            );
+            modal.show();
+        });
+    });
+
+    // 배송 처리 버튼
+    document.getElementById("deliveryBtn").addEventListener("click", function(){
+        const orderNo = this.dataset.orderNo;
+        console.log("배송 처리 주문번호:", orderNo);
+        // 나중에 배송 처리 Controller 호출
+    });
 });
 </script>
-
 </head>
 
 <body>
@@ -27,6 +139,35 @@ $(function(){
 
 		<!-- 사이드바 -->
 		<c:import url="../fragments/sidebar.jsp"></c:import>
+
+		<%
+		RangeDTO rDTO = new RangeDTO();
+		
+		rDTO.setStartDate(request.getParameter("startDate"));
+		rDTO.setEndDate(request.getParameter("endDate"));
+		rDTO.setDelivery_status(request.getParameter("delivery_status"));
+		
+		String currentPage = request.getParameter("currentPage");
+		
+		int page = 1;
+		
+		if (currentPage != null && !currentPage.isEmpty()) {
+		page = Integer.parseInt(currentPage);
+		}
+		
+		int pageScale = 10;
+		
+		rDTO.setStartNum((page - 1) * pageScale + 1);
+		rDTO.setEndNum(page * pageScale);
+		
+		OrderManagementService oms = new OrderManagementService();
+		
+		List<OrderDTO> orderList = oms.getOrderList(rDTO);
+		
+		request.setAttribute("orderList", orderList);
+		request.setAttribute("rangeDTO", rDTO);
+		request.setAttribute("currentPage", page);
+		%>
 
 		<!-- 메인 -->
 		<div class="main">
@@ -43,6 +184,7 @@ $(function(){
 				<h2 class="page-title">주문목록</h2>
 
 				<!-- 검색 영역 -->
+				<form action="adminOrder.jsp" method="get" id="searchForm">
 				<div class="search-box">
 					<div class="search-row">
 						<label>조회기간</label>
@@ -78,6 +220,7 @@ $(function(){
 					</div>
 
 				</div>
+				</form>
 
 				<!-- 주문 목록 -->
 				<table class="order-table">
@@ -97,35 +240,44 @@ $(function(){
 					</thead>
 
 					<tbody id="orderTableBody">
+					<c:if test="${empty orderList}">
 						<tr>
-							<td><input type="checkbox"></td>
-							<td>1</td>
-							<td>202506200001</td>
-							<td>user01</td>
-							<td>유기농 사과</td>
-							<td>2025-06-20</td>
-							<td>15,000원</td>
-							<td>1</td>
-							<td>배송준비중</td>
+							<td colspan="10">조회된 주문 내역이 없습니다.</td>
+						</tr>
+					</c:if>
+					<c:forEach var="order" items="${orderList}" varStatus="status">
+						<tr>
 							<td>
-								<button class="claim-btn">교환 요청</button>
+								<input type="checkbox" name="selectedOrder" value="${order.orderID}">
+							</td>
+							<td>${status.count}</td>
+							<td>${order.orderID}</td>
+							<td>${order.clientID}</td>
+							<td>${order.prdName}</td>
+							<td>${order.orderDate}</td>
+							<td>${order.totalAmount}원</td>
+							<td>${order.quantity}</td>
+							<td>
+								${order.orderStatus}
+								<c:if test="${not empty order.deliveryStatus}">
+								<br>
+								<span>${order.deliveryStatus}</span>
+								</c:if>
+							</td>
+							<td>
+								<c:choose>
+									<c:when test="${not empty order.claimID}">
+										<button type="button" class="cancel-btn" data-order-id="${order.orderID}" data-claim-id="${order.claimID}">
+											클레임 상세
+										</button>
+									</c:when>
+									<c:otherwise>
+										-
+									</c:otherwise>
+								</c:choose>
 							</td>
 						</tr>
-
-						<tr>
-							<td><input type="checkbox"></td>
-							<td>2</td>
-							<td>202506200002</td>
-							<td>user02</td>
-							<td>방울토마토</td>
-							<td>2025-06-20</td>
-							<td>12,000원</td>
-							<td>2</td>
-							<td>배송완료</td>
-							<td>
-								<button class="cancel-btn" data-order-no="202506200002">취소 요청</button>
-							</td>
-						</tr>
+					</c:forEach>
 					</tbody>
 				</table>
 
@@ -136,8 +288,7 @@ $(function(){
 			</div>
 		</div>
 	</div>
-	<script src="http://localhost/jsp_prj/manage/js/bootstrap.bundle.min.js"></script>
-	<script src="http://localhost/jsp_prj/manage/js/order.js"></script>
+	<script src="../js/bootstrap.bundle.min.js"></script>
 
 	<!-- 취소 요청 상세 -->
 	<div class="modal fade" id="cancelModal" tabindex="-1">
@@ -151,16 +302,16 @@ $(function(){
 				<div class="modal-body">
 					<table class="table table-bordered">
 						<tr>
-							<th>클레임번호</th>
-							<td>81377</td>
-							<th>취소요청일시</th>
-							<td>2025-07-11 17:22:28</td>
+						    <th>클레임번호</th>
+						    <td id="claimID"></td>
+						    <th>취소요청일시</th>
+						    <td id="requestDate"></td>
 						</tr>
 						<tr>
-							<th>클레임상태</th>
-							<td>취소요청</td>
-							<th>구매자 연락처</th>
-							<td>010-1111-1111</td>
+						    <th>클레임상태</th>
+						    <td id="claimStatus"></td>
+						    <th>구매자연락처</th>
+						    <td id="clientTel"></td>
 						</tr>
 					</table>
 
@@ -175,15 +326,7 @@ $(function(){
 								<th>취소수량</th>
 							</tr>
 						</thead>
-						<tbody>
-							<tr>
-								<td>1</td>
-								<td>1000036987</td>
-								<td>친환경 바른계란</td>
-								<td>8,000</td>
-								<td>2</td>
-							</tr>
-						</tbody>
+						<tbody id="claimProductBody"></tbody>
 					</table>
 				</div>
 
