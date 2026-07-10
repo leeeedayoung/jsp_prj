@@ -29,7 +29,8 @@ request.setCharacterEncoding("UTF-8"); %>
 <%
 //request는 web parameter를 받을 수 없다.
 File saveDir
-=new File("C:/Users/user/git/jsp_prj/jsp_prj/src/main/webapp/upload");
+=new File("C:/webhome/upload/profile");
+//=new File("C:/Users/user/git/jsp_prj/jsp_prj/src/main/webapp/upload");
 int maxSize=1024*1024*10; //업로드 파일의 제약 크기 10Mbyte,
 int uploadMaxSize=1024*1024*50; //업로드 파일의 제약 크기 50Mbyte
 

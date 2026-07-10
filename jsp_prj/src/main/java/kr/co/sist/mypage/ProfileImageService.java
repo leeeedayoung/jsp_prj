@@ -23,7 +23,8 @@ public class ProfileImageService {
 		
 		//저장경로
 		File saveDir=new File
-			("C:/Users/user/git/jsp_prj/jsp_prj/src/main/webapp/upload/profile");
+//			("C:/Users/user/git/jsp_prj/jsp_prj/src/main/webapp/upload/profile");
+		("C:/webhome/upload/profile");
 		//최대파일 크기(15Mbyte)
 		int maxSize=1024*1024*15;
 		//최대파일 허용크기(50Mbyte)
