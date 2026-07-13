@@ -17,10 +17,6 @@
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
 
 <script>
-let selectedInput = "";
-let selectedPreview = "";
-let selectedCard = null;
-
 $(function(){
     $(".accordion-header").click(function(){
         let content=$(this).next(".accordion-content");
@@ -42,36 +38,51 @@ $(function(){
     $("#productDesc").on("input",function(){
         $("#descCount").text($(this).val().length);
     });
+    
+    $("#shortInfo").on("input",function(){
+        $("#shortCount").text($(this).val().length);
+    });
 
     $(".image-btn").click(function(){
-        selectedInput=$(this).data("target");
-        selectedPreview=$(this).data("preview");
-        selectedCard=null;
+        let target = $(this).data("target");
+        let name = $(this).data("name");
+        let type = $(this).data("type");
+        
+        $("#imageFile").val("");
 
-        $(".image-card").removeClass("selected");
-        $("#imageModal").css("display","flex");
+        $("#imageFile").data("target", target);
+        $("#imageFile").data("name", name);
+        $("#imageType").val(type);
+        $("#imageFile").click();
     });
 
-    $("#closeImageModal,#cancelImageBtn").click(function(){
-        $("#imageModal").hide();
-    });
-
-    $(document).on("click",".image-card",function(){
-        $(".image-card").removeClass("selected");
-        $(this).addClass("selected");
-        selectedCard=$(this);
-    });
-
-    $("#selectImageBtn").click(function(){
-        if(selectedCard==null){
-            alert("이미지를 선택하세요.");
+    $("#imageFile").change(function(){
+        let file = this.files[0];
+        if(!file){
             return;
         }
-        let url=selectedCard.data("url");
+        let formData = new FormData();
+        formData.append("imageFile", file);
+        formData.append("imageType", $("#imageType").val());
 
-        $("#"+selectedInput).val(url);
-        $("#"+selectedPreview).attr("src",url);
-        $("#imageModal").hide();
+        $.ajax({
+            url:"fileUploadProcess.jsp",
+            type:"POST",
+            data:formData,
+            processData:false,
+            contentType:false,
+            success:function(result){
+            	let imageList = [];
+                let target = $("#imageFile").data("target");
+                let name = $("#imageFile").data("name");
+                $("#"+target).val(result);
+                $("#"+name).val(file.name);
+                alert("이미지가 등록되었습니다.");
+            },
+            error:function(){
+                alert("이미지 업로드 실패");
+            }
+        });
     });
 });
 
@@ -105,11 +116,12 @@ $(function(){
 
 						<div class="accordion-content">
 							<div class="input-group">
-								<label for="category">카테고리 <span class="required">*</span></label> <select id="category"
-									name="category">
+								<label for="category">카테고리 <span class="required">*</span></label> 
+								<select id="category" name="category">
 									<option value="">카테고리를 선택하세요.</option>
-									<option value="fruit">과일</option>
-									<option value="vegetable">채소</option>
+									<option value="CAT000001">과일</option>
+									<option value="CAT000002">채소</option>
+									<option value="CAT000003">음료</option>
 								</select> 
 							</div>
 						</div>
@@ -118,8 +130,8 @@ $(function(){
 					<!-- 상품명 -->
 					<div class="accordion-item">
 						<div class="accordion-header">
-							<span>상품명 <span class="required">*</span></span> <span
-								class="arrow">&#9662;</span>
+							<span>상품명 <span class="required">*</span></span> 
+							<span class="arrow">&#9662;</span>
 						</div>
 						<div class="accordion-content">
 							<!-- 상품명 -->
@@ -127,8 +139,18 @@ $(function(){
 								<label for="productName">상품명 <span class="required">*</span></label>
 								<div class="input-box">
 									<input type="text" id="productName" name="prdName"
-										maxlength="50" placeholder="상품명을 입력하세요."> <span
-										class="count"> <span id="nameCount">0</span>/50자
+										maxlength="50" placeholder="상품명을 입력하세요.">
+										<span class="count"> <span id="nameCount">0</span>/50자
+									</span>
+								</div>
+							</div>
+							<!-- 상품 한줄 설명 -->
+							<div class="input-row">
+								<label for="productDesc">짧은 소개</label>
+								<div class="input-box">
+									<textarea id="shortInfo" name="shortInfo" maxlength="70"
+										placeholder="소개를 입력하세요."></textarea>
+									<span class="count"><span id="shortCount">0</span>/70자
 									</span>
 								</div>
 							</div>
@@ -138,7 +160,7 @@ $(function(){
 								<div class="input-box">
 									<textarea id="productDesc" name="prdDescription" maxlength="150"
 										placeholder="상품설명을 입력하세요."></textarea>
-									<span class="count"> <span id="descCount">0</span>/150자
+									<span class="count"><span id="descCount">0</span>/150자
 									</span>
 								</div>
 							</div>
@@ -194,6 +216,7 @@ $(function(){
 							
 								<!-- 이미지 -->
 								<div class="option-title">이미지</div>
+								<input type="hidden" id="imageList" name="imageList">
 								<table class="image-table">
 									<tr>
 										<th width="60">NO</th>
@@ -205,56 +228,56 @@ $(function(){
 										<td>1</td>
 										<td>썸네일</td>
 										<td>
-											<input type="text" id="thumbFileName" readonly placeholder="선택된 파일이 없습니다.">
-											<input type="file" id="thumbImg" name="thumbImg" accept="image/*">
+											<input type="hidden" id="thumbImg" name="thumbImg">
+											<input type="text" id="thumbFileName" readonly placeholder="선택된 이미지가 없습니다.">
 										</td>
 										<td>
-											<button type="button" class="image-btn" data-target="thumbImg" data-preview="thumbPreview">등록하기</button>
+											<button type="button" class="image-btn" data-target="thumbImg" data-name="thumbFileName" data-type="THUMB">등록하기</button>
 										</td>
 									</tr>
 									<tr>
 										<td>2</td>
 										<td>대표이미지</td>
 										<td>
-											<input type="text" id="mainFileName" readonly placeholder="선택된 파일이 없습니다.">
-											<input type="file" id="mainImg" name="mainImg" accept="image/*" hidden>
+											<input type="hidden" id="mainImg" name="mainImg">
+											<input type="text" id="mainFileName" readonly placeholder="선택된 이미지가 없습니다.">
 										</td>
 										<td>
-											<button type="button" class="image-btn" data-target="mainImg" data-preview="mainPreview">등록하기</button>
+											<button type="button" class="image-btn" data-target="mainImg" data-name="mainFileName" data-type="MAIN">등록하기</button>
 										</td>
 									</tr>
 									<tr>
 										<td>3</td>
 										<td>상품설명</td>
 										<td>
-											<input type="text" id="descFileName" readonly placeholder="선택된 파일이 없습니다.">
-											<input type="file" id="descImg" name="descImg" accept="image/*" hidden>
+											<input type="hidden" id="descImg" name="descImg">
+											<input type="text" id="descFileName" readonly placeholder="선택된 이미지가 없습니다.">
 										</td>
 										<td>
-											<button type="button" class="image-btn" data-target="descImg" data-preview="descPreview">등록하기</button>
+											<button type="button" class="image-btn" data-target="descImg" data-name="descFileName" data-type="DESC">등록하기</button>
 										</td>
 									</tr>
 									<tr>
 										<td>4</td>
 										<td>상세정보</td>
 										<td>
-											<input type="text" id="detailFileName" readonly placeholder="선택된 파일이 없습니다.">
-											<input type="file" id="detailImg" name="detailImg" accept="image/*" hidden>
+											<input type="hidden" id="detailImg" name="detailImg">
+											<input type="text" id="detailFileName" readonly placeholder="선택된 이미지가 없습니다.">
 										</td>
 										<td>
-											<button type="button" class="image-btn" data-target="detailImg" data-preview="detailPreview">등록하기</button>
+											<button type="button" class="image-btn" data-target="detailImg" data-name="detailFileName" data-type="DETAIL">등록하기</button>
 										</td>
 									</tr>
 								</table>
 
 								<!-- 제조사 -->
 								<div class="form-row">
-									<label>제조사</label> <input type="text" name="manufacturer">
+									<label>제조사</label><input type="text" name="manufacturer">
 								</div>
 
 								<!-- 원산지 -->
 								<div class="form-row">
-									<label>원산지</label> <input type="text" name="origin">
+									<label>원산지</label><input type="text" name="origin">
 								</div>
 
 								<!-- 미성년자 구매 -->
@@ -266,14 +289,14 @@ $(function(){
 									</div>
 								</div>
 
-								<!-- 무게 -->
+								<!-- 용량 -->
 								<div class="form-row">
-									<label>무게(g)</label> <input type="number" name="weight" min="1">
+									<label>용량</label><input type="text" name="weight" min="1">
 								</div>
 
 								<!-- 유통기한 -->
 								<div class="form-row">
-									<label>유통기한</label> <input type="date" name="expirationDate">
+									<label>유통기한</label><input type="date" name="expirationDate">
 								</div>
 
 								<!-- 보관방법 -->
@@ -292,7 +315,19 @@ $(function(){
 									<label>판매단위</label> 
 									<input type="text" name="salesUnit" placeholder="예) 1팩">
 								</div>
+								
+								<!-- 수량 -->
+								<div class="form-row">
+									<label>판매수량</label> 
+									<input type="text" name="quantity">
+								</div>
 
+								<!-- 주의사항 -->
+								<div class="form-row">
+									<label>주의사항</label>
+									<textarea name="notice" rows="2"></textarea>
+								</div>
+								
 								<!-- 추가정보 -->
 								<div class="form-row">
 									<label>추가정보</label>
@@ -310,23 +345,10 @@ $(function(){
 		</div>
 	</div>
 
-	<div id="imageModal" class="image-modal">
-		<div class="image-modal-content">
-			<div class="image-modal-header">
-				<h3>이미지 선택</h3>
-				<button type="button" id="closeImageModal">×</button>
-			</div>
-
-			<!-- 이미지 목록 -->
-			<div class="image-list"></div>
-
-			<!-- 하단 버튼 -->
-			<div class="modal-footer">
-				<button type="button" id="cancelImageBtn">취소</button>
-				<button type="button" id="selectImageBtn">선택</button>
-			</div>
-		</div>
-	</div>
+	<form id="uploadForm" enctype="multipart/form-data" style="display:none">
+    <input type="file" id="imageFile" name="imageFile" accept="image/*">
+    <input type="hidden" id="imageType" name="imageType">
+</form>
 </body>
 
 </html>

@@ -14,34 +14,22 @@
 <link href="../css/bootstrap.min.css" rel="stylesheet">
 <link href="../css/dashboard.css" rel="stylesheet">
 <link href="../css/user.css" rel="stylesheet">
+<link href="../css/pagination.css" rel="stylesheet">
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
 
 <script type="text/javascript">
 $(function(){
-    function searchUser(){
-        let keyword = $("#searchInput").val().toLowerCase().trim();
-
-        $(".user-row").each(function(){
-            let name = $(this).data("name").toLowerCase();
-            let email = $(this).data("email").toLowerCase();
-            let phone = $(this).data("phone");
-            if(name.includes(keyword) || email.includes(keyword) || phone.includes(keyword)){
-                $(this).show();
-            }else{
-                $(this).hide();
-            }
-        });
-    }//searchUser
-    
     $("#searchBtn").click(function(){
         let keyword=$("#searchInput").val();
-        location.href="adminUsers.jsp?currentPage=1&keyword="+encodeURIComponent(keyword);
+        let sort = "${param.sort}";
+        location.href="adminUsers.jsp?currentPage=1&keyword="+encodeURIComponent(keyword)+"&sort="+sort;
     });
 
     $("#searchInput").keypress(function(e){
         if(e.key === "Enter"){
             let keyword=$("#searchInput").val();
-            location.href="adminUsers.jsp?currentPage=1&keyword="+encodeURIComponent(keyword);
+            let sort = "${param.sort}";
+            location.href="adminUsers.jsp?currentPage=1&keyword="+encodeURIComponent(keyword)+"&sort="+sort;
         }
     });
 
@@ -49,28 +37,15 @@ $(function(){
         $("#sortMenu").toggle();
     });//click
 
-    $("#sortMenu li").click(function(){
-        let type = $(this).data("sort");
-        let rows = $(".user-row").get();
+    $("#sortMenu li").click(function () {
+        let sort = $(this).data("sort");
+        let keyword = $("#searchInput").val();
 
-        rows.sort(function(a,b){
-            let aName = $(a).data("name");
-            let bName = $(b).data("name");
-            let aDate = new Date($(a).data("date"));
-            let bDate = new Date($(b).data("date"));
-
-            switch(type){
-                case "nameAsc": return aName.localeCompare(bName);
-                case "nameDesc": return bName.localeCompare(aName);
-                case "dateAsc": return aDate - bDate;
-                case "dateDesc": return bDate - aDate;
-            }
-        });
-
-        $(".user-table tbody").html(rows);
-        $("#sortMenu").hide();
+        location.href = 
+        	"adminUsers.jsp?currentPage=1" + "&keyword=" + encodeURIComponent(keyword) + 
+        			"&sort=" + sort;
     });
-
+    
     // 바깥 클릭 시 정렬 메뉴 닫기
     $(document).click(function(e){
         if(!$(e.target).closest(".sort-box").length){
@@ -81,69 +56,69 @@ $(function(){
 
 $(function(){
 	let selectedRow = null;
-    $(document).on("click",".user-row",function(){
-        let clientId=$(this).data("id");
-        // 같은 회원 다시 클릭하면 닫기
-        if(selectedRow === this){
-            $("#userDetail").hide();
-            $(this).removeClass("selected");
-            selectedRow = null;
-            return;
-        }//end if
-        $(".user-row").removeClass("selected");
-        $(this).addClass("selected");
-        selectedRow = this;
-        $.ajax({
-            url:"clientDetail.jsp",
-            type:"get",
-            dataType:"json",
-            data:{
-                clientId:clientId
-            },
-            success:function(data){
-                $("#detailName").text(data.name);
-                $("#detailEmail").text(data.email);
-                $("#detailPhone").text(data.phone);
-                $("#detailDate").text(data.joinDate);
-                $("#detailPayment").text(data.totalPayment);
-                $("#userDetail").show();
-                $("#resetPasswordBtn").data("id",clientId);
-            }
-        });//ajax
-    });
-	
-	$("#resetPasswordBtn").click(function(){
-		let pw = $("#newPassword").text();
-	    let clientId = $("#resetPasswordBtn").data("id");
+	$(document).on("click", ".user-row", function(){
+	    let clientId = $(this).data("id");
+	    if (selectedRow === this) {
+	        $("#userDetail").hide();
+	        $(this).removeClass("selected");
+	        selectedRow = null;
+	        return;
+	    }
+	    $(".user-row").removeClass("selected");
+	    $(this).addClass("selected");
+	    selectedRow = this;
 	    $.ajax({
-	        url:"resetPassword.jsp",
-	        type:"get",
-	        dataType:"json",
-	        data:{
-	            clientId:clientId
+	        url: "clientDetail.jsp",
+	        type: "get",
+	        dataType: "json",
+	        data: {
+	            clientId: clientId
 	        },
-	        success:function(data){
-	            $("#newPassword").text(data.newPw);
-	            new bootstrap.Modal(document.getElementById("resetPasswordModal")).show();
+	        success: function(data){
+	            $("#detailName").text(data.name);
+	            $("#detailEmail").text(data.email);
+	            $("#detailPhone").text(data.phone);
+	            $("#detailDate").text(data.joinDate);
+	            $("#detailPayment").text(data.totalPayment);
+	            $("#resetPasswordBtn").data("id", clientId);
+	            $("#userDetail").show();
+	        },
+	        error: function(){
+	            alert("회원 상세 정보를 불러오는 중 오류가 발생했습니다.");
 	        }
 	    });
 	});
-	
-	$("#resetConfirmBtn").click(function(){
-	    let pw=$("#newPassword").text();
-	    let clientId = $("#resetPasswordBtn").data("id");
+
+	$("#resetPasswordBtn").click(function(){
+	    let clientId = $(this).data("id");
+	    if (!clientId) {
+	        alert("회원을 먼저 선택해주세요.");
+	        return;
+	    }
 	    $.ajax({
-	        url:"sendEmail.jsp",
-	        type:"get",
-	        data:{
-	        	clientId:clientId,
-	            newPw:pw
+	        url: "resetPassword.jsp",
+	        type: "get",
+	        dataType: "json",
+	        data: {
+	            clientId: clientId
 	        },
-	        success:function(){
-	            alert("비밀번호 초기화 완료");
-	            bootstrap.Modal.getInstance(document.getElementById("resetPasswordModal")).hide();
+	        success: function(data){
+	            $("#newPassword").text(data.newPw);
+	            new bootstrap.Modal(
+	                document.getElementById("resetPasswordModal")
+	            ).show();
+	        },
+	        error: function(){
+	            alert("비밀번호 초기화 처리 중 오류가 발생했습니다.");
 	        }
 	    });
+	});
+
+	$("#resetConfirmBtn").click(function(){
+	    alert("비밀번호가 초기화되었습니다.");
+	    bootstrap.Modal.getInstance(
+	        document.getElementById("resetPasswordModal")
+	    ).hide();
 	});
 });
 </script>
@@ -155,44 +130,48 @@ $(function(){
 		<!-- 사이드바 -->
 		<c:import url="../fragments/sidebar.jsp"></c:import>
 
-		<jsp:useBean id="rDTO" class="kr.co.sist.manage.client.RangeDTO" scope="page"/>
+		<jsp:useBean id="rDTO" class="manage.client.RangeDTO" scope="page"/>
 		<jsp:setProperty name="rDTO" property="*"/>
 		<%
 		ClientService cs = new ClientService();
 		
 		String keyword = request.getParameter("keyword");
-		if (keyword != null) {
-			rDTO.setKeyword(keyword.trim());
+		if(keyword == null){
+		    keyword = "";
 		}
+		rDTO.setKeyword(keyword);
 		
-		String tempPage = request.getParameter("currentPage");
+		int sort = 0;
+		try{
+		    sort = Integer.parseInt(request.getParameter("sort"));
+		}catch(Exception e){
+		    sort = 0;
+		}
+		rDTO.setSort(sort);
+		
 		int currentPage = 1;
-		
-		if (tempPage != null && !tempPage.trim().isEmpty()) {
-			try {
-				currentPage = Integer.parseInt(tempPage);
-			} catch (NumberFormatException nfe) {
-				currentPage = 1;
-			}
+		try{
+		    currentPage = Integer.parseInt(request.getParameter("currentPage"));
+		}catch(Exception e){
+		    currentPage = 1;
 		}
 		
 		int pageScale = 10;
-		int totalCnt = cs.getTotalCount();
-		int pageCnt = totalCnt / pageScale;
+		int total = cs.getTotalCount();
+		int totalCnt = cs.getRangeCount(rDTO);
+		int pageCnt = (int)Math.ceil((double)totalCnt/pageScale);
 		
-		if (totalCnt % pageScale != 0) {
-			pageCnt++;
+		if(pageCnt == 0){
+		    pageCnt = 1;
+		}
+		if(currentPage < 1){
+		    currentPage = 1;
+		}
+		if(currentPage > pageCnt){
+		    currentPage = pageCnt;
 		}
 		
-		if (currentPage < 1) {
-			currentPage = 1;
-		}
-		
-		if (pageCnt > 0 && currentPage > pageCnt) {
-			currentPage = pageCnt;
-		}
-		
-		int startNum = (currentPage - 1) * pageScale + 1;
+		int startNum = (currentPage-1) * pageScale + 1;
 		int endNum = currentPage * pageScale;
 		
 		rDTO.setStartNum(startNum);
@@ -200,12 +179,22 @@ $(function(){
 		rDTO.setTotalCnt(totalCnt);
 		rDTO.setPageCnt(pageCnt);
 		
+		int pageBlock = 3;
+	    int startPage = ((currentPage - 1) / pageBlock) * pageBlock + 1;
+	    int endPage = startPage + pageBlock - 1;
+	    if(endPage > pageCnt){
+	        endPage = pageCnt;
+	    }
+		
 		List<ClientDTO> clientList = cs.getClientList(rDTO);
 		
 		pageContext.setAttribute("clientList", clientList);
-		pageContext.setAttribute("currentPage", currentPage);
 		pageContext.setAttribute("rDTO", rDTO);
+		pageContext.setAttribute("currentPage", currentPage);
 		pageContext.setAttribute("newCount", cs.getNewCount());
+		pageContext.setAttribute("total", total);
+		pageContext.setAttribute("startPage", startPage);
+		pageContext.setAttribute("endPage", endPage);
 		%>
 
 		<!-- 메인 -->
@@ -227,7 +216,7 @@ $(function(){
 						<div class="summary-icon">👥</div>
 						<div>
 							<div class="summary-title">전체 사용자</div>
-							<div class="summary-count">${ rDTO.totalCnt }명</div>
+							<div class="summary-count">${ total }명</div>
 						</div>
 					</div>
 
@@ -250,10 +239,10 @@ $(function(){
 							<div class="sort-box">
 								<button type="button" id="sortBtn">정렬 ⇔</button>
 								<ul id="sortMenu" class="sort-menu">
-									<li data-sort="nameAsc">이름 오름차순</li>
-									<li data-sort="nameDesc">이름 내림차순</li>
-									<li data-sort="dateAsc">가입일 오름차순</li>
-									<li data-sort="dateDesc">가입일 내림차순</li>
+									<li data-sort="1">이름 오름차순</li>
+									<li data-sort="2">이름 내림차순</li>
+									<li data-sort="3">가입일 오름차순</li>
+									<li data-sort="4">가입일 내림차순</li>
 								</ul>
 							</div>
 						</div>
@@ -274,7 +263,7 @@ $(function(){
 								</tr>
 								</c:if>
 								<c:forEach var="client" items="${ clientList }">
-								<tr class="user-row" data-id="${ client.clientId }" 
+								<tr class="user-row" data-id="${ client.clientNo }" 
 									data-name="${ client.clientName }" data-email="${ client.email }" 
 									data-phone="${ client.phone }" data-date="${ client.joinDate }">
 									<td>${ client.clientName }</td>
@@ -285,10 +274,41 @@ $(function(){
 								</c:forEach>
 							</tbody>
 						</table>
-						<div id="divPagination" style="text-align:center">
-						<c:forEach var="i" begin="1" end="${rDTO.pageCnt}">
-						[<a href="adminUsers.jsp?currentPage=${i}&keyword=${param.keyword}">${i}</a>]
-						</c:forEach>
+						
+						<div id="divPagination-wrap" class="pagination" style="text-align:center">
+						<c:if test="${rDTO.totalCnt > 0}">
+						
+						    <!-- 이전 그룹 -->
+						    <c:if test="${startPage > 1}">
+						        <a class="page"
+						           href="adminUsers.jsp?currentPage=${startPage-1}&keyword=${param.keyword}&sort=${param.sort}">
+						            ◀
+						        </a>
+						    </c:if>
+						
+						    <!-- 페이지 번호 -->
+						    <c:forEach var="i" begin="${startPage}" end="${endPage}">
+						        <c:choose>
+						            <c:when test="${i == currentPage}">
+						                <span class="page active">${i}</span>
+						            </c:when>
+						            <c:otherwise>
+						                <a class="page"
+						                   href="adminUsers.jsp?currentPage=${i}&keyword=${param.keyword}&sort=${param.sort}">
+						                    ${i}
+						                </a>
+						            </c:otherwise>
+						        </c:choose>
+						    </c:forEach>
+						
+						    <!-- 다음 그룹 -->
+						    <c:if test="${endPage < rDTO.pageCnt}">
+						        <a class="page"
+						           href="adminUsers.jsp?currentPage=${endPage+1}&keyword=${param.keyword}&sort=${param.sort}">
+						            ▶
+						        </a>
+						    </c:if>
+						</c:if>
 						</div>
 					</div>
 
